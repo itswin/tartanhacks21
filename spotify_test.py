@@ -5,6 +5,7 @@ import os
 import shutil
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import pandas as pd
 
 import lyrics_getter
 
@@ -39,8 +40,7 @@ def get_tracks_from_raw(data):
             # pprint(p)
         song_title = p['track']['name']
         artist_name = p['track']['artists'][0]['name']
-        played_at = p['played_at']
-        tracks += [(song_title, artist_name, played_at)]
+        tracks += [(song_title, artist_name)]
 
     return tracks
 
@@ -103,6 +103,20 @@ def get_playlist_lyrics(name, id, num_tracks):
     print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
 
     return playlist_lyrics
+
+def analyze_playlists(sp):
+    playlist_data = sp.current_user_playlists()
+    for playlist in playlist_data['items']:
+        id = playlist['id']
+        num_tracks = playlist['tracks']['total']
+        all_tracks = []
+        TRACK_REQUEST_LIMIT = 100
+        for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
+            playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
+            all_tracks += playlist_track_data['items']
+        formatted_tracks = []
+        for track in all_tracks:
+            curr
 
 
 if __name__ == "__main__":
