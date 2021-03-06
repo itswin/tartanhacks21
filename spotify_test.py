@@ -39,7 +39,8 @@ def get_tracks_from_raw(data):
             # pprint(p)
         song_title = p['track']['name']
         artist_name = p['track']['artists'][0]['name']
-        tracks += [(song_title, artist_name)]
+        played_at = p['played_at']
+        tracks += [(song_title, artist_name, played_at)]
 
     return tracks
 

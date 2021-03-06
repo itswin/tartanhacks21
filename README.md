@@ -9,7 +9,7 @@ in command line:
 `flask run`\
 open it on http://127.0.0.1:5000/
 
-for clour stuff:
+for cloud stuff:
 Need to install cloud stuff beforehand\
 `pip3 install google-cloud-storage google-cloud-language`
 
