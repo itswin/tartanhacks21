@@ -1,0 +1,2 @@
+export PROJECT_ID=tartanhacks21
+export GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json
