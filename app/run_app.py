@@ -14,7 +14,7 @@ authUrl = "https://accounts.spotify.com/authorize"
 tokenUrl = "https://accounts.spotify.com/api/token"
 apiUrl = "https://api.spotify.com/v1"
 
-redirectUri = "http://127.0.0.1:5000/spotify_analysis"
+redirectUri = "http://127.0.0.1:5000/app_host"
 scope = 'user-read-private user-read-playback-state user-modify-playback-state user-library-read'
 
 authQueryParams = {
@@ -35,7 +35,7 @@ def spotify_auth():
     auth_url = auth_manager.get_authorize_url()
     return redirect(auth_url)
 
-@app.route('/spotify_analysis')
+@app.route('/app_host')
 def spotify_analysis():
     authCode = request.args['code']
     codePayload = {
@@ -46,9 +46,7 @@ def spotify_analysis():
     base64val = base64.b64encode("{}:{}".format(clientId, clientSecret).encode())
     headers = {"Authorization" : "Basic {}".format(base64val.decode())}
 
-    print("waiting")
     postReq = requests.post(tokenUrl, data = codePayload, headers = headers)
-    print("here now!")
     response = json.loads(postReq.text)
     accessToken = response["access_token"]
     refreshToken = response["refresh_token"]
