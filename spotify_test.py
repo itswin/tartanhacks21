@@ -5,6 +5,7 @@ import os
 import shutil
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+import pandas as pd
 
 import lyrics_getter
 
@@ -30,7 +31,8 @@ def init_spotify():
 
 
 def get_tracks_from_raw(data):
-    tracks = []
+    final_data_frame = None
+    data_for_dataframe = []
     for p in data['items']:
         if p['track'] is None:
             print("[BAD]")
@@ -39,22 +41,24 @@ def get_tracks_from_raw(data):
             # pprint(p)
         song_title = p['track']['name']
         artist_name = p['track']['artists'][0]['name']
-        # played_at = p['played_at']
-        tracks += [(song_title, artist_name)]
 
-    return tracks
+        played_at = p['played_at']
+        data_for_dataframe.append([song_title, artist_name, played_at])
+
+    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time'])
 
 
 def get_playlist_tracks(sp, id, num_tracks):
     TRACK_REQUEST_LIMIT = 100
 
-    all_tracks = []
+    all_tracks = None
     playlist_tracks = None
 
     for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
         playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
         playlist_tracks = get_tracks_from_raw(playlist_track_data)
-        all_tracks += playlist_tracks
+        if all_tracks is None: all_tracks = playlist_tracks
+        else: all_tracks.append(playlist_tracks, ignore_index=True)
 
     return all_tracks
 
@@ -88,7 +92,8 @@ def get_playlist_lyrics(name, id, num_tracks):
     tracks = get_playlist_tracks(sp, id, num_tracks)
     print("[FOUND SONGS]", len(tracks), "songs")
 
-    for song_title, artist_name in tracks:
+    for track_item in tracks.iterrows():
+        song_title, artist_name, played_at = track_item["Name"], track_item["Artist"], track_item["Time"]
         lyrics = lyrics_getter.get_song_lyrics(song_title, artist_name)
         if lyrics is not None:
             playlist_lyrics += [(song_title, artist_name, lyrics)]
@@ -103,6 +108,9 @@ def get_playlist_lyrics(name, id, num_tracks):
     print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
 
     return playlist_lyrics
+# def add_to_tracks(database, tracks):
+# def get_tracks_in_date_range(range, tracks):
+# def get_mood_in_date_range(rnage, tracks):
 
 
 def get_tracks_from_raw_rec(data):
