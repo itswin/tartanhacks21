@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "tartanhacks21",
+  "private_key_id": "6fa1f13b2a3de434eb681bc17fcef82f2f6de7c7",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC0fMUSi7WBS9k+\nhzZKMY2Ra5coJPxvlZK5e1YE/WF+p/PNdqnGItRmqLRjj0UL4aiQC6OsXqUQ1Ode\n2dMIaAl0lP6jY39hBUjpHdKWWkOXS/DZdiInlkhLuhiaXp72MtituSG8vDBbgP2B\nSZIlEwptB4zrGTTtNW6ZCuJEiAf9j+28PutJFsuWl9Y4DEhm6EIJaKGMsEQlWI/6\n0qDhPV0L9eUiX5+XAHb69SKxWI7nWEGqdJds056km6ofB5QTC2kOtUMLaEQM/iwo\ncNbKzwUXbHarct8oCwuwWv6pgBUPaF4jyZHRBFnBao9jIR62pOYhna973HDPMTto\ndGL5Xm7nAgMBAAECggEAIh0PFqFHbifK6PGfhkh1bI38ZP8Qo3qO3/X63TiTC+Bs\nyWHrVuLQaJLsfYDf2Q4O0SMSDYtaAaNsE9Zx973KQ7nBo1o0Aj+Ad2dGnVp0Og2F\neWTFsdvK0F1dNxg5TWlw4O0D/mtHbJQl1iD0uYMuzkrGDM2X3lniDJUtDSz07azM\nPkOnbTCLqji1E8G3DeDSGOSxfaxLVHkw6e36mMkNUW2Q7xc4vPfXWCEdnFK44V8L\nIirUUOmAezuyt7qEs5Fy33CznHmn7hu+WWNsyCzgAm+TDdanjS3C3haQenLXam1f\nY4ARikt6xx+VPs1E1okaIqWX2yn9H8PJUboIE2DLSQKBgQDfZQPYHvRWSKY6QDVm\nX9zO0gXVF4v/7gADwi7kFXKP7GCPam2jyci/2G0VJZrAib+StB4xnS92F3HdgSlk\nY+EoZnoNnuEYNXEyGOksw7CqzDDqzSdN6Tw397Me1FEKLrrHwXNcPHx8WflAP4LB\nfctOcbSRtEMmyGGI/vO61actQwKBgQDO1I54zqnuqjampK4sVUq7foE7ozZkJrgP\n0zrNFh4LjEXH3ldLwfaBTGSYEQkcoQNgN5/w4i7i/gqyXGlD37qfNc7PY135UQQx\nu//RTZQw7uGS0xRBP1wFl+5mBa6kbTeFixURDe1g+jC3udsXOkGtbxBPl31XdxNL\n35XoCGrrjQKBgQChZcUKPwr+z8wxJ7Ss+zN3xWtrUnDWfihKjt/777buXrRAyX7f\nJ+k/GeltrtaIprzfC/0IkWz53+RnSWsTWcoRu0ARWSl9qRbYQAEvU07vh0kMSx5L\nfuf/85jY/EJ0neBac9yZ1iWGXibjkT8x9mWNjj8MSfV+LqWxKaoD4VrAKwKBgGmL\nOCTXuQmsXHUPRj4jTB5/gK0RLXlP9M9GiBQNvElCTH2grUVgdk0m0ZJz5wVv+MwJ\ntplyomB9KLI5zBGxwobqK13TJCpMuGo0uGdzQjLyQ7Pr+MMO9QN5s1LmhWcswI9q\nGNb6F29MXL30nqOsu8UoDte+w1x1zCgEsXeVjBIlAoGBAJRxP+GBbCLizRL7ar1Z\ns2jj9no5Ai2QJNRIU07+5MtXESnlC7bCiwbdQVM5FaAXbptOCWcLGLblr3FgQp2y\nGxYmE+spVLY+TJMqTLuknP1hVaniU+cdmmdgbmJhOLxhP4k9XN3V0DK7NSpO0ntI\nPpRI8GwoOWTd1/BtJAe9isQs\n-----END PRIVATE KEY-----\n",
+  "client_email": "my-nl-sa@tartanhacks21.iam.gserviceaccount.com",
+  "client_id": "109399774059565130102",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/my-nl-sa%40tartanhacks21.iam.gserviceaccount.com"
+}
