@@ -10,3 +10,6 @@ Need to export some gcloud variables so\
 Note: gcloud pricing is tied to Winston's credit card so don't go crazy on the sentiment testing lol.\
 It won't actually charge me until we hit like 5k requests, and even then it's only like $1 per 1k requests.\
 But just something to keep in mind.
+
+For spotify-test.py, need to export some spotify credentials first, so run \
+`source setup_spotify_environment.sh`
