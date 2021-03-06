@@ -3,10 +3,10 @@ TartanHacks21
 
 for running authentication:
 in command line:
-pip install spotipy
-pip install flask
-export FLASK_APP=spotify_analysis.py
-flask run
+`pip install spotipy`\
+`pip install flask`\
+`export FLASK_APP=spotify_analysis.py`\
+`flask run`\
 open it on http://127.0.0.1:5000/
 
 for clour stuff:
