@@ -39,8 +39,8 @@ def get_tracks_from_raw(data):
             # pprint(p)
         song_title = p['track']['name']
         artist_name = p['track']['artists'][0]['name']
-        played_at = p['played_at']
-        tracks += [(song_title, artist_name, played_at)]
+        # played_at = p['played_at']
+        tracks += [(song_title, artist_name)]
 
     return tracks
 
@@ -103,6 +103,53 @@ def get_playlist_lyrics(name, id, num_tracks):
     print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
 
     return playlist_lyrics
+
+
+def get_tracks_from_raw_rec(data):
+    tracks = []
+    for p in data['tracks']:
+        song_title = p['name']
+        artist_name = p['artists'][0]['name']
+        tracks += [(song_title, artist_name)]
+
+    return tracks
+
+
+'''
+Valid types are album, artist, playlist, track, show, and episode.
+'''
+def get_spotify_ids(sp, queries, type='track'):
+    if not queries:
+        return queries
+    
+    key = type + 's'
+    ids = []
+    for q in queries:
+        res = sp.search(q, limit=1, offset=0, type=type)
+        id = res[key]['items'][0]['id']
+        ids.append(id)
+    
+    return ids
+
+
+'''
+Need at least one of seed_artists, seed_genres, seed_tracks
+1-5 seeds per type.
+
+attributes is a dict with each target attribute (e.g. min_valence, target_liveness)
+
+Returns a list of tuple (song_title, artist_name)
+'''
+def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=None, attributes=None):
+    seed_artist_ids = get_spotify_ids(sp, seed_artists, 'artist')
+    seed_track_ids = get_spotify_ids(sp, seed_tracks, 'track')
+    
+    if attributes:
+        recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, **attributes)
+    else:
+        recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids)
+    
+    return get_tracks_from_raw_rec(recs)
 
 
 if __name__ == "__main__":
