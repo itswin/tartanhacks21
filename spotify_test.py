@@ -23,7 +23,6 @@ before running this script.
 
 def init_spotify():
     scope = "user-read-currently-playing user-read-recently-played playlist-read-private playlist-read-collaborative"
-    # scope = "user-read-recently-played"
 
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
@@ -31,30 +30,58 @@ def init_spotify():
 
 
 def get_tracks_from_raw(data):
-    tracks = []
+    final_data_frame = None
+    data_for_dataframe = []
     for p in data['items']:
         if p['track'] is None:
             print("[BAD]")
             continue
-            # pprint(tracks)
-            # pprint(p)
         song_title = p['track']['name']
         artist_name = p['track']['artists'][0]['name']
-        tracks += [(song_title, artist_name)]
+        played_at = p['played_at']
+        data_for_dataframe.append([song_title, artist_name, played_at])
+    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time'])
 
-    return tracks
+def get_sentiment_from_song(sp, title, artist) {
+    lyrics = lyrics_getter.get_song_lyrics(title, artist)
 
+}
+
+def get_playlist_tracks_from_raw(data, sp):
+    final_data_frame = None
+    data_for_dataframe = []
+    for p in data['items']:
+        if p['track'] is None:
+            print("[BAD]")
+            continue
+        song_title = p['track']['name']
+        artist_name = p['track']['artists'][0]['name']
+        song_id = p['track']['id']
+        if not song_id:
+            print("[BAD]")
+            continue
+        song_analysis = sp.audio_features([song_id])
+        if not song_analysis:
+            print("[BAD]")
+            continue
+        danceability = song_analysis[0]['danceability']
+        energy = song_analysis[0]['energy']
+        loudness = song_analysis[0]['loudness']
+        liveness = song_analysis[0]['liveness']
+        data_for_dataframe.append([song_title, artist_name, danceability, energy, loudness, liveness])
+    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Danceability', 'Energy', 'Loudness', 'Liveness'])
 
 def get_playlist_tracks(sp, id, num_tracks):
     TRACK_REQUEST_LIMIT = 100
 
-    all_tracks = []
+    all_tracks = None
     playlist_tracks = None
 
     for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
         playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
-        playlist_tracks = get_tracks_from_raw(playlist_track_data)
-        all_tracks += playlist_tracks
+        playlist_tracks = get_playlist_tracks_from_raw(playlist_track_data, sp)
+        if all_tracks is None: all_tracks = playlist_tracks
+        else: all_tracks.append(playlist_tracks, ignore_index=True)
 
     return all_tracks
 
@@ -68,8 +95,6 @@ def get_current_user_playlists(sp):
     playlists = []
     for p in playlist_data['items']:
         playlists += [(p['name'], p['id'], p['tracks']['total'])]
-        # pprint(p)
-        # break
 
     return playlists
 
@@ -88,7 +113,8 @@ def get_playlist_lyrics(name, id, num_tracks):
     tracks = get_playlist_tracks(sp, id, num_tracks)
     print("[FOUND SONGS]", len(tracks), "songs")
 
-    for song_title, artist_name in tracks:
+    for track_item in tracks.iterrows():
+        song_title, artist_name, played_at = track_item["Name"], track_item["Artist"], track_item["Time"]
         lyrics = lyrics_getter.get_song_lyrics(song_title, artist_name)
         if lyrics is not None:
             playlist_lyrics += [(song_title, artist_name, lyrics)]
@@ -106,24 +132,16 @@ def get_playlist_lyrics(name, id, num_tracks):
 
 def analyze_playlists(sp):
     playlist_data = sp.current_user_playlists()
+    dataframes = []
     for playlist in playlist_data['items']:
         id = playlist['id']
         num_tracks = playlist['tracks']['total']
-        all_tracks = []
-        TRACK_REQUEST_LIMIT = 100
-        for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
-            playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
-            all_tracks += playlist_track_data['items']
-        formatted_tracks = []
-        for track in all_tracks:
-            curr
+        dataframes.append(get_playlist_tracks(sp, id, num_tracks))
+    return dataframes
 
 
 if __name__ == "__main__":
     sp = init_spotify()
-
-    # cur_track = sp.current_user_playing_track()
-    # print(cur_track)
 
     playlists = get_current_user_playlists(sp)
     print(playlists)
@@ -138,25 +156,4 @@ if __name__ == "__main__":
     for name, id, num_tracks in playlists:
         playlist_lyrics = get_playlist_lyrics(name, id, num_tracks)
 
-        # for song_title, artist_name, lyrics in playlist_lyrics:
-        #     title = ''.join(ch for ch in song_title if ch.isalnum())
-        #     file_name = song_title + "_" + artist_name + ".txt"
-        #     path = folder_name + file_name
-        #     with open(path, "w") as f:
-        #         f.write(lyrics)
-
         print()
-
-
-
-    # recently_played = get_current_user_recently_played(sp)
-    # print(recently_played)
-
-    # for (song_title, artist_name) in recently_played:
-    #     print(song_title, artist_name)
-    #     song_lyrics = lyrics_getter.get_song_lyrics(song_title, artist_name)
-    #
-    #     if song_lyrics is not None:
-    #         filename = "recently_played_lyrics/" + song_title + "_" + artist_name
-    #         with open(filename, "w") as f:
-    #             f.write(song_lyrics)

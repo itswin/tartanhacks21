@@ -59,6 +59,6 @@ def spotify_analysis():
     sp = spotipy.Spotify(auth = accessToken, auth_manager = auth_manager)
 
     print(sp.current_user())
-    playlist = spotify_test.analyze_playlists(sp)
+    dataframes = spotify_test.analyze_playlists(sp)
 
-    return render_template('main.html', username = playlist)
+    return render_template('main.html', username = dataframes[1])
