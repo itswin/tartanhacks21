@@ -6,6 +6,8 @@ import shutil
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
+import datetime
+
 
 import lyrics_getter
 
@@ -108,9 +110,17 @@ def get_playlist_lyrics(name, id, num_tracks):
     print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
 
     return playlist_lyrics
-# def add_to_tracks(database, tracks):
-# def get_tracks_in_date_range(range, tracks):
-# def get_mood_in_date_range(rnage, tracks):
+def add_to_tracks(df, new_tracks):
+    df.append(new_tracks, ignore_index = True)
+    return df
+def get_tracks_in_date_range(min_time, max_time, df):
+    def inRange(row):
+        time_string = row["Time"]
+        corresonding_time = datetime.datetime.strptime(time_string,"%Y-%m-%dT%H:%M:%S.%fZ")
+        return min_time < corresonding_time and corresonding_time < max_time
+    return df[df.apply(inRange, axis=1)]
+
+# def get_mood_in_date_range(raage, tracks):
 
 
 def get_tracks_from_raw_rec(data):
