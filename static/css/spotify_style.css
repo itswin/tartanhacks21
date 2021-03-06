@@ -1,0 +1,64 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    padding: 5vh 5vw;
+  }
+  
+  p {
+    max-width: 700px;
+  }
+  
+  li {
+    margin-bottom: 5px;
+  }
+  
+  input {
+    width: 250px;
+    margin-bottom: 10px;
+  }
+  
+  footer {
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 1px solid lightgrey;
+  }
+  
+  footer > a {
+    color: #BBBBBB;
+  }
+  
+  .nicejob {
+    text-decoration: line-through;
+  }
+  
+  #results {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    max-height: 30vh;
+  }
+  
+  #results li {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  @media screen and (max-width: 900px) {
+    #results {
+      display: inline-block;
+      max-height: auto;
+    }
+  }
+  
+  @media screen and (min-width: 1280px) {
+    #results {
+      max-height: 15vh;
+    }
+  }
+  
+  #features-chart {
+    width: 100%;
+    min-height:400px;
+  }  
