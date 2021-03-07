@@ -26,6 +26,57 @@ def init_spotify():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
     return sp
+def create_vector_values(sp,txt):
+    song_list, artist_list = None, None
+    with open("reference_songs/" + txt + ".txt", "r") as f:
+        lines = f.readlines()
+        song_list = [x.strip() for x in lines[0::2]]
+        artist_list = [x.strip() for x in lines[1::2]]
+    track_ids = []
+    for index in range(len(song_list)):
+        track, artist = song_list[index], artist_list[index]
+        
+        track_id = sp.search(q='track:' + track, limit=1,type='track')
+        track_id = track_id['tracks']['items'][0]['id']
+        track_ids.append(track_id)
+    main_frame = pd.DataFrame()
+    main_frame['Song ID'] = track_ids
+    final_audio_features = []
+    all_song_ids = main_frame['Song ID']
+    num_songids = len(all_song_ids)
+    # print("song ids:" + str(num_songids))
+    TRACK_REQUEST_LIMIT = 100
+    for index in range(0, num_songids, TRACK_REQUEST_LIMIT):
+        print(index)
+        curr_songids = all_song_ids[index:min(num_songids, index + TRACK_REQUEST_LIMIT)]
+        features = sp.audio_features(curr_songids)
+        final_audio_features += features
+
+    danceabilities = [features['danceability'] for features in final_audio_features]
+    energies = [features['energy'] for features in final_audio_features]
+    tempos = [features['tempo'] for features in final_audio_features]
+    valences = [features['valence'] for features in final_audio_features]
+
+    # print(len(all_tracks))
+    # print(len(danceabilities))
+
+    main_frame['Danceability'] = danceabilities
+    main_frame['Energy'] = energies
+    main_frame['Tempo'] = tempos
+    main_frame['Valence'] = valences
+    return (main_frame['Danceability'].mean(),main_frame['Energy'].mean(), main_frame['Tempo'].mean(),main_frame['Valence'].mean())
+
+def classify_song_emotion(song_values): #song values is the tuple of the values of the song we are trying to classify in order "Danceability", "Energy", "Tempo", "Valence"
+    def dot_product(v1, v2):
+        return v1[0]*v2[0] + v1[1] * v2[1] + v1[2]*v2[2] + v1[3]*v2[3]
+    classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Angry": (0.6049, 0.7454500000000001, 108.40515, 0.5322499999999999)}
+    best_dot_product = 0
+    best_emotion = None
+    for key in classifier_dict:
+        if dot_product(classifier_dict[key], song_values) > best_dot_product:
+            best_dot_product = dot_product(key,song_values)
+            best_emotion = key
+    return best_emotion
 
 
 def get_tracks_from_raw(sp, data):
@@ -43,7 +94,7 @@ def get_tracks_from_raw(sp, data):
         id = p['track']['id']
         data_for_dataframe.append([song_title, artist_name, played_at,id])
 
-    main_frame =pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'Song ID', ])
+    main_frame =pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'Song ID'])
     
     final_audio_features = []
     all_song_ids = main_frame['Song ID']
