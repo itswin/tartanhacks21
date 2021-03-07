@@ -138,7 +138,7 @@ def get_song_lyrics(song_title, artist_name):
 
 
 def get_song_lyrics_batch(tracks):
-    print("-----[START GET BATCH]")
+    # print("-----[START GET BATCH]")
     # print(tracks)
 
     '''
@@ -186,11 +186,11 @@ def get_song_lyrics_batch(tracks):
             reqs += [grequests.get(song_urls[i])]
             temp += [tracks[i]]
 
-    print("len", len(reqs))
+    # print("len", len(reqs))
 
     responses = grequests.map(reqs)
 
-    print("batch responses")
+    # print("batch responses")
     # print(responses)
 
     batch_lyrics = []
@@ -203,7 +203,7 @@ def get_song_lyrics_batch(tracks):
         # print(lyrics)
         # break
 
-    print("done")
+    # print("done")
 
     return batch_lyrics
 

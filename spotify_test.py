@@ -69,7 +69,7 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
     return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
 
 def get_emotion_value_from_playlist(zipped, danceability=0, energy=0, tempo=0, valence=0):
-    print("getting new emotion value from playlist")
+    # print("getting new emotion value from playlist")
     lyrics = lyrics_getter.get_song_lyrics_batch(zipped)
     # print(lyrics)
     lyrics = ". ".join([l[1] for l in lyrics])
@@ -141,7 +141,7 @@ def get_playlist_tracks(sp, id, num_tracks):
     num_songids = len(all_song_ids)
     # print("song ids:" + str(num_songids))
     for index in range(0, num_songids, TRACK_REQUEST_LIMIT):
-        print(index)
+        # print(index)
         curr_songids = all_song_ids[index:min(num_songids, index + TRACK_REQUEST_LIMIT)]
         features = sp.audio_features(curr_songids)
         final_audio_features += features
@@ -159,7 +159,7 @@ def get_playlist_tracks(sp, id, num_tracks):
     all_tracks['Tempo'] = tempos
     all_tracks['Valence'] = valences
 
-    print("done")
+    # print("done")
 
     return all_tracks
 

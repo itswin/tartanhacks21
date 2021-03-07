@@ -66,8 +66,8 @@ def spotify_analysis():
     # last_day_tracks = spt.get_tracks_in_date_range(datetime(2021, 3, 6, 0, 0, 0, 0),datetime(2021, 3, 7, 0, 0, 0, 0),all_tracks)
     information = spt.analyze_playlists(sp)
     # for curr_dict in information:
-    name = information[0]['name']
-    avg_vals = information[0]['averages']
+    # name = information[0]['name']
+    # avg_vals = information[0]['averages']
 
 
-    return render_template('main.html', name = name, avg_vals = avg_vals)
+    return render_template('main.html', information = information)

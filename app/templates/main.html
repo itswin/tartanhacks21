@@ -18,8 +18,14 @@
 <body>
   <header>
     <h1>Welcome</h1>
-    <p>{{name}}</p>
-    <p>{{avg_vals}}</p>
+    <table>
+      {% for info in information %}
+         <tr>
+              <th> {{ info['name'] }} </th>
+              <td> {{ info['averages'] }} </td>
+         </tr>
+      {% endfor %}
+    </table>
   </header>
 
 </body>
