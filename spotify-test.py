@@ -1,12 +1,12 @@
-from pprint import pprint
+import lyrics_getter
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+
 import time
 import sys
 import os
 import shutil
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 
-import lyrics_getter
 
 
 '''
@@ -82,38 +82,38 @@ def get_current_user_recently_played(sp):
 
 
 def get_playlist_lyrics(name, id, num_tracks):
-    playlist_lyrics = []
     print(name)
     tracks = get_playlist_tracks(sp, id, num_tracks)
     print("[FOUND SONGS]", len(tracks), "songs")
 
-    for song_title, artist_name in tracks:
-        lyrics = lyrics_getter.get_song_lyrics(song_title, artist_name)
-        if lyrics is not None:
-            playlist_lyrics += [(song_title, artist_name, lyrics)]
-
-            folder_name = "lyrics/" + name + "/"
-            title = ''.join(ch for ch in song_title if ch.isalnum())
-            file_name = title + "_" + artist_name + ".txt"
-            path = folder_name + file_name
-            with open(path, "w") as f:
-                f.write(lyrics)
-
-    print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
+    playlist_lyrics = lyrics_getter.get_song_lyrics_batch(tracks)
+    print("[FOUND LYRICS]")
 
     return playlist_lyrics
+
+
+def save_song(playlist_name, song_title, artist_name, lyrics):
+    folder_name = "lyrics/" + name + "/"
+
+    simple_song_title = ''.join(ch for ch in song_title if ch.isalnum())
+    simple_artist_name = ''.join(ch for ch in artist_name if ch.isalnum())
+    file_name = simple_song_title + "_" + simple_artist_name + ".txt"
+
+    path = folder_name + file_name
+    # print(path, song_title, artist_name, lyrics[:25], "\n")
+
+    with open(path, "w") as f:
+        f.write(lyrics)
 
 
 if __name__ == "__main__":
     sp = init_spotify()
 
-    # cur_track = sp.current_user_playing_track()
-    # print(cur_track)
-
     playlists = get_current_user_playlists(sp)
     print(playlists)
     print()
 
+    # reset folders
     for name, id, num_tracks in playlists:
         folder_name = "lyrics/" + name + "/"
         if os.path.isdir(folder_name):
@@ -123,15 +123,14 @@ if __name__ == "__main__":
     for name, id, num_tracks in playlists:
         playlist_lyrics = get_playlist_lyrics(name, id, num_tracks)
 
-        # for song_title, artist_name, lyrics in playlist_lyrics:
-        #     title = ''.join(ch for ch in song_title if ch.isalnum())
-        #     file_name = song_title + "_" + artist_name + ".txt"
-        #     path = folder_name + file_name
-        #     with open(path, "w") as f:
-        #         f.write(lyrics)
+        for (song_title, artist_name), lyrics in playlist_lyrics:
+            save_song(name, song_title, artist_name, lyrics)
 
         print()
 
+
+    # cur_track = sp.current_user_playing_track()
+    # print(cur_track)
 
 
     # recently_played = get_current_user_recently_played(sp)
