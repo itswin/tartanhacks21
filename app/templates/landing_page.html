@@ -124,76 +124,60 @@ body {font-size:16px;}
     <div class="w3-container" id="designplaylist" style="margin-top:75px">
         <h1 class="w3-xxxlarge w3-text-red"><b>Design Your Own Playlist.</b></h1>
         <hr style="width:50px;border:5px solid red" class="w3-round">
-        {{wtf.quick_form(form)}}
-        <p>{{form_submit_msg}}</p>
+        <p></p>
+        <!-- <p class = "form-slider-bar">
+          {{form.acoustic.label}}:
+          {{form.acoustic(min=0, max=100, oninput = "outputUpdate('#selected-acoustic', value)")}}
+          <output for="acoustic" id="selected-acoustic">{{form.acoustic.data}}</output>
+        </p>
+        <p class = "form-slider-bar">
+          {{form.danceable.label}}:
+          {{form.danceable(min=0, max=100, oninput = "outputUpdate('#selected-danceable', value)")}}
+          <output for="danceable" id="selected-danceable">{{form.danceable.data}}</output>
+        </p>
+        <p class = "form-slider-bar">
+          {{form.energy.label}}:
+          {{form.energy(min=0, max=100, oninput = "outputUpdate('#selected-energy', value)")}}
+          <output for="energy" id="selected-energy">{{form.energy.data}}</output>
+        </p>
+        <p class = "form-slider-bar">
+          {{form.positivity.label}}:
+          {{form.positivity(min=0, max=100, oninput = "outputUpdate('#selected-positivity', value)")}}
+          <output for="positivity" id="selected-positivity">{{form.positivity.data}}</output>
+        </p>
+        <p class = "form-slider-bar">
+          {{form.instrumental.label}}:
+          {{form.instrumental(min=0, max=100, oninput = "outputUpdate('#selected-instrumental', value)")}}
+          <output for="instrumental" id="selected-instrumental">{{form.instrumental.data}}</output>
+        </p>
+        <p class = "form-slider-bar">
+          {{form.liveness.label}}:
+          {{form.liveness(min=0, max=100, oninput = "outputUpdate('#selected-positivity', value)")}}
+          <output for="liveness" id="selected-liveness">{{form.liveness.data}}</output>
+        </p>
+        <p>{{wtf.form_field(form.genre)}}</p>
+        <p>{{wtf.form_field(form.limit)}}</p> -->
+        <p>{{wtf.quick_form(form)}}</p> 
       </div>
 
-    <!-- Packages / Pricing Tables -->
-  <div class="w3-container" id="packages" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Packages.</b></h1>
-    <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>Some text our prices. Lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure</p>
-  </div>
-
-  <div class="w3-row-padding">
-    <div class="w3-half w3-margin-bottom">
-      <ul class="w3-ul w3-light-grey w3-center">
-        <li class="w3-dark-grey w3-xlarge w3-padding-32">Basic</li>
-        <li class="w3-padding-16">Floorplanning</li>
-        <li class="w3-padding-16">10 hours support</li>
-        <li class="w3-padding-16">Photography</li>
-        <li class="w3-padding-16">20% furniture discount</li>
-        <li class="w3-padding-16">Good deals</li>
-        <li class="w3-padding-16">
-          <h2>$ 199</h2>
-          <span class="w3-opacity">per room</span>
-        </li>
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-white w3-padding-large w3-hover-black">Sign Up</button>
-        </li>
-      </ul>
-    </div>
-        
-    <div class="w3-half">
-      <ul class="w3-ul w3-light-grey w3-center">
-        <li class="w3-red w3-xlarge w3-padding-32">Pro</li>
-        <li class="w3-padding-16">Floorplanning</li>
-        <li class="w3-padding-16">50 hours support</li>
-        <li class="w3-padding-16">Photography</li>
-        <li class="w3-padding-16">50% furniture discount</li>
-        <li class="w3-padding-16">GREAT deals</li>
-        <li class="w3-padding-16">
-          <h2>$ 249</h2>
-          <span class="w3-opacity">per room</span>
-        </li>
-        <li class="w3-light-grey w3-padding-24">
-          <button class="w3-button w3-red w3-padding-large w3-hover-black">Sign Up</button>
-        </li>
-      </ul>
-    </div>
-  </div>
-  
-  <!-- Contact -->
-  <div class="w3-container" id="contact" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Contact.</b></h1>
-    <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>Do you want us to style your home? Fill out the form and fill me in with the details :) We love meeting new people!</p>
-    <form action="/action_page.php" target="_blank">
-      <div class="w3-section">
-        <label>Name</label>
-        <input class="w3-input w3-border" type="text" name="Name" required>
-      </div>
-      <div class="w3-section">
-        <label>Email</label>
-        <input class="w3-input w3-border" type="text" name="Email" required>
-      </div>
-      <div class="w3-section">
-        <label>Message</label>
-        <input class="w3-input w3-border" type="text" name="Message" required>
-      </div>
-      <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Send Message</button>
-    </form>  
-  </div>
+      <table class = "styled-table">
+        <thead>
+            <tr>
+                <th>Song Name</th>
+                <th>Song Artist</th>
+                <th>Link to Song</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for info in form_submit_msg %}
+                <tr>
+                    <th> {{ info[0] }} </th>
+                    <td> {{ info[1] }} </td>
+                    <td> <a href={{ info[2] }} target="_blank" style="color:blue">Click Here!</a> </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 <!-- End page content -->
 </div>
@@ -219,6 +203,10 @@ function onClick(element) {
   document.getElementById("modal01").style.display = "block";
   var captionText = document.getElementById("caption");
   captionText.innerHTML = element.alt;
+}
+
+function outputUpdate(query, val) {
+  document.querySelector(query).value = val
 }
 </script>
 

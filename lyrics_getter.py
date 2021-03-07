@@ -57,7 +57,7 @@ def cleanup_lyrics(lyrics):
     for l in lines:
         if "[" not in l:
             ret += [l]
-    return " ".join(ret)
+    return ". ".join(ret)
 
 '''
 Removes all new line characters from lyrics
@@ -141,41 +141,6 @@ def get_song_lyrics_batch(tracks):
     # print("-----[START GET BATCH]")
     # print(tracks)
 
-    '''
-    song_infos = []
-    for song_title, artist_name in tracks:
-        response = request_song_info(song_title, artist_name)
-        json = response.json()
-        remote_song_info = None
-
-        # print(json)
-        # pprint(json)
-
-        for hit in json['response']['hits']:
-            # print('consider', hit['result']['primary_artist']['name'])
-            # pprint(hit)
-            if artist_name.lower() in hit['result']['primary_artist']['name'].lower():
-                remote_song_info = hit
-                break
-
-        # pprint(remote_song_info)
-        if remote_song_info is None:
-            print("Could not find song/artist")
-            continue
-
-        remote_song_title, remote_artist_name = remote_song_info['result']['title'], remote_song_info['result']['primary_artist']['name']
-        song_url = remote_song_info['result']['url']
-
-        print("Found song", remote_song_title, remote_artist_name)
-        print("Song URL:", song_url)
-
-        song_infos += [(remote_song_title, remote_artist_name, song_url)]
-
-    # print("---[SONGS]---")
-    # print(song_infos)
-
-    reqs = [grequests.get(x[2]) for x in song_infos]
-    '''
     song_infos = request_song_info_batch(tracks)
     song_urls = [get_url_from_genius(tracks[i], song_infos[i]) for i in range(len(tracks))]
 

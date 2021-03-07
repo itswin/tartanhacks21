@@ -15,10 +15,38 @@ from datetime import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from wtforms import StringField, SubmitField, SelectField, RadioField
-from wtforms.validators import DataRequired
+from wtforms.fields.html5 import IntegerRangeField
+from wtforms.validators import DataRequired, NumberRange
+
+genre_map = dict([(1,"Pop"), 
+            (2,"hip-hop"),
+            (3,"Rock"),
+            (4,"edm"),
+            (5,"Latin"),
+            (6,"alt_rock"),
+            (7,"Classical"),
+            (9,"Country"),
+            (10,"Metal")])
+
+limit_map = dict([(1,"10"), 
+            (2,"20"),
+            (3,"30"),
+            (4,"40"),
+            (5,"50"),
+            (6,"60"),
+            (7,"70"),
+            (8,"80"),
+            (9,"90"),
+            (10,"100")])
 
 class RecommendationForm(FlaskForm):
-    acoustic = RadioField('Acoustic Level:', choices = [(1,1)])
+    # acoustic = RadioField('Acoustic Level:', choices = [(1,"10%")])
+    acoustic = IntegerRangeField('Acousticness', [NumberRange(min=0, max=100)])
+    danceable = IntegerRangeField('Danceability', [NumberRange(min=0, max=100)])
+    energy = IntegerRangeField('Energy', [NumberRange(min=0, max=100)])
+    positivity = IntegerRangeField('Positivity', [NumberRange(min=0, max=100)])
+    instrumental = IntegerRangeField('Instrumentalness', [NumberRange(min=0, max=100)])
+    liveness = IntegerRangeField('Liveness', [NumberRange(min=0, max=100)])
     genre = SelectField('Genre To Base Off Of', choices = [(1,"Pop"), 
                                                             (2,"Hip Hop/Rap"),
                                                             (3,"Rock"),
@@ -26,10 +54,19 @@ class RecommendationForm(FlaskForm):
                                                             (5,"Latin"),
                                                             (6,"Indie/Alternative"),
                                                             (7,"Classical"),
-                                                            (8,"K-Pop"),
                                                             (9,"Country"),
                                                             (10,"Metal")])
-    submit = SubmitField('Submit')
+    limit = SelectField('How Many Songs to Search For', choices = [(1,"10"), 
+                                                            (2,"20"),
+                                                            (3,"30"),
+                                                            (4,"40"),
+                                                            (5,"50"),
+                                                            (6,"60"),
+                                                            (7,"70"),
+                                                            (8,"80"),
+                                                            (9,"90"),
+                                                            (10,"100")])
+    submit = SubmitField('Search')
 
 clientId = "a8bdd721f4804917bef2258bd38e62c2"
 clientSecret = "17248bb726b44503976fdb357cb229d1"
@@ -120,15 +157,29 @@ def spotify_analysis():
     print("here")
     message = ""
     if form.validate_on_submit():
+        print(genre_map)
+        genre_seed = [genre_map[int(form.genre.data)].lower()]
+        limit = int(limit_map[int(form.limit.data)])
+        acousticness = int(form.acoustic.data) / 100
+        danceability = int(form.danceable.data) / 100
+        energy = int(form.energy.data) / 100
+        positivity = int(form.positivity.data) / 100
+        instrumental = int(form.instrumental.data) / 100
+        liveness = int(form.liveness.data) / 100
+        attributes = {'target_acousticness' : acousticness,
+                      'target_danceability' : danceability,
+                      'target_energy' : energy,
+                      'target_valence' : positivity,
+                      'target_instrumentalness' : instrumental}
+        print(genre_seed)
+        print(attributes)
+        recommendations = spt.get_recommendations(sp, seed_genres=genre_seed, attributes=attributes, limit=limit)
+        print(recommendations)
+        message = recommendations
         print("submitted form")
-        message = "hello"
     print("here2")
     # form = None
 
     return render_template('landing_page.html', playlist_info = playlist_info, recently_played_info = recently_played_info,
                                                 form = form,
                                                 form_submit_msg = message)
-
-@app.route('/asdf')
-def hello():
-    print("got here in hello")
