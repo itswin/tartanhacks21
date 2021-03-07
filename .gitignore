@@ -1,4 +1,6 @@
 lyrics/*
 __pycache__
 .cache
+
 *.pyc
+app/__pycache__

@@ -7,7 +7,6 @@ def analyze_text_sentiment(text):
     response = client.analyze_sentiment(document=document)
 
     sentiment = response.document_sentiment
-    print(sentiment)
     results = dict(
         text=text,
         score=f"{sentiment.score:.1%}",
@@ -26,3 +25,7 @@ def classify_text(text):
         print("=" * 80)
         print(f"category  : {category.name}")
         print(f"confidence: {category.confidence:.0%}")
+
+if __name__ == '__main__':
+    text = "Bharath is an amazing person"
+    analyze_text_sentiment(text)
