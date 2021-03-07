@@ -128,8 +128,8 @@ def get_song_lyrics(song_title, artist_name):
     remote_song_title, remote_artist_name = remote_song_info['result']['title'], remote_song_info['result']['primary_artist']['name']
     song_url = remote_song_info['result']['url']
 
-    print("Found song", remote_song_title, remote_artist_name)
-    print("Song URL:", song_url)
+    # print("Found song", remote_song_title, remote_artist_name)
+    # print("Song URL:", song_url)
 
     song_lyrics = scrape_song_url(song_url)
     song_lyrics = postprocessing_lyrics(song_lyrics)
@@ -203,6 +203,7 @@ def get_song_lyrics_batch(tracks):
         # print(lyrics)
         # break
 
+    print("done")
 
     return batch_lyrics
 

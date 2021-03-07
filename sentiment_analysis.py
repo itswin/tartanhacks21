@@ -9,11 +9,12 @@ def analyze_text_sentiment(text):
     sentiment = response.document_sentiment
     results = dict(
         text=text,
-        score=f"{sentiment.score:.1%}",
-        magnitude=f"{sentiment.magnitude:.1%}",
+        score=sentiment.score,
+        magnitude=sentiment.magnitude,
     )
-    for k, v in results.items():
-        print(f"{k:10}: {v}")
+    # for k, v in results.items():
+    #     print(f"{k:10}: {v}")
+    return results
 
 def classify_text(text):
     client = language.LanguageServiceClient()
