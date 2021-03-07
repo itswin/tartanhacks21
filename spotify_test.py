@@ -369,7 +369,9 @@ def get_tracks_from_raw_rec(data):
         song_title = p['name']
         artist_name = p['artists'][0]['name']
         link = p['external_urls']['spotify']
-        tracks += [(song_title, artist_name, link)]
+        uri = p['uri']
+        curr_dict = {'title' : song_title, 'artist' : artist_name, 'link' : link, 'uri' : uri}
+        tracks.append(curr_dict)
 
     return tracks
 
@@ -407,7 +409,7 @@ def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=Non
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, limit=limit, **attributes)
     else:
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, limit=limit)
-    print(recs)
+    # print(recs)
     return get_tracks_from_raw_rec(recs)
 
 
