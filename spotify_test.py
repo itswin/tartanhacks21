@@ -74,7 +74,7 @@ def classify_song_emotion(song_values): #song values is the tuple of the values 
         for i in range(len(v1)):
             currV1 = v1[i]
             currV2 = v2[i]
-            temp += abs(currV1 - currV2)
+            temp += abs((currV1 - currV2) / currV2)**2
         return math.sqrt(temp)
 
     classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Angry": (0.6049, 0.7454500000000001, 108.40515, 0.5322499999999999)}
@@ -234,7 +234,6 @@ def get_playlist_tracks(sp, id, num_tracks):
 
     all_tracks = None
     playlist_tracks = None
-
     for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
         playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
         playlist_tracks = get_playlist_tracks_from_raw(playlist_track_data, sp)
@@ -331,8 +330,8 @@ def analyze_playlists(sp):
         id = playlist['id']
         num_tracks = playlist['tracks']['total']
         name = playlist['name']
-        curr_dataframe = get_playlist_tracks(sp, id, num_tracks)
-
+        if(num_tracks != 0): curr_dataframe = get_playlist_tracks(sp, id, num_tracks)
+        else: continue
         names = curr_dataframe['Name'].tolist()
         artists = curr_dataframe['Artist'].tolist()
         zipped = list(zip(names, artists))
