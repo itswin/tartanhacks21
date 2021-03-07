@@ -27,6 +27,7 @@ def init_spotify():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
     return sp
+
 def create_vector_values(sp,txt):
     song_list, artist_list = None, None
     with open("reference_songs/" + txt + ".txt", "r") as f:
@@ -150,15 +151,27 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
         sentiment = 0
     return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
 
+# Change to True to execute sentiment analysis ONCE
+callSentimentAnalysis = False
 def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo=0, valence=0):
-    # print("getting new emotion value from playlist")
+    global callSentimentAnalysis
+    # print("getting new emotion value from playlist", callSentimentAnalysis)
     analysis = None
-    callSentimentAnalysis = False
     if zipped is not None and callSentimentAnalysis:
+        callSentimentAnalysis = False
         lyrics = lyrics_getter.get_song_lyrics_batch(zipped)
         # print(lyrics)
-        lyrics = ". ".join([l[1] for l in lyrics])
-        analysis = sentiment_analysis.analyze_text_sentiment(lyrics)
+        lyrics = [l[1] for l in lyrics]
+
+        # 25, 5
+        MAX_SAMPLE_LEN = 6
+        MAX_BATCH_LEN = 3
+        sampled_lyrics = random.sample(lyrics, min(MAX_SAMPLE_LEN, len(lyrics)))
+        batched_lyrics = [". ".join(sampled_lyrics[i:i+MAX_BATCH_LEN]) for i in range (0, len(sampled_lyrics), MAX_BATCH_LEN)]
+        
+        analyses = [sentiment_analysis.analyze_text_sentiment_workaround(batch) for batch in batched_lyrics]
+        analysis = {'score' : sum(res['score'] for res in analyses) / len(analyses),
+                    'magnitude' :  sum(res['magnitude'] for res in analyses) / len(analyses)}
     else:
         #junk code for now to not use up cloud requests (CHANGE FOR REAL THING)
         sign = 1
