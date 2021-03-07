@@ -1,16 +1,15 @@
-import lyrics_getter
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-
+from pprint import pprint
 import time
 import sys
 import os
 import shutil
-
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 import datetime
 
 
+import lyrics_getter
 
 
 '''
@@ -90,45 +89,30 @@ def get_current_user_recently_played(sp):
 
 
 def get_playlist_lyrics(name, id, num_tracks):
+    playlist_lyrics = []
     print(name)
     tracks = get_playlist_tracks(sp, id, num_tracks)
     print("[FOUND SONGS]", len(tracks), "songs")
 
-
-    # playlist_lyrics = lyrics_getter.get_song_lyrics_batch(tracks)
-    # print("[FOUND LYRICS]")
-
-    playlist_lyrics = []
     for track_item in tracks.iterrows():
         song_title, artist_name, played_at = track_item["Name"], track_item["Artist"], track_item["Time"]
         lyrics = lyrics_getter.get_song_lyrics(song_title, artist_name)
         if lyrics is not None:
             playlist_lyrics += [(song_title, artist_name, lyrics)]
 
-    return playlist_lyrics
+            folder_name = "lyrics/" + name + "/"
+            title = ''.join(ch for ch in song_title if ch.isalnum())
+            file_name = title + "_" + artist_name + ".txt"
+            path = folder_name + file_name
+            with open(path, "w") as f:
+                f.write(lyrics)
 
-
-def save_song(playlist_name, song_title, artist_name, lyrics):
-    folder_name = "lyrics/" + name + "/"
-
-    simple_song_title = ''.join(ch for ch in song_title if ch.isalnum())
-    simple_artist_name = ''.join(ch for ch in artist_name if ch.isalnum())
-    file_name = simple_song_title + "_" + simple_artist_name + ".txt"
-
-    path = folder_name + file_name
-    # print(path, song_title, artist_name, lyrics[:25], "\n")
-
-    with open(path, "w") as f:
-        f.write(lyrics)
+    print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
 
     return playlist_lyrics
-
-
 def add_to_tracks(df, new_tracks):
     df.append(new_tracks, ignore_index = True)
     return df
-
-
 def get_tracks_in_date_range(min_time, max_time, df):
     def inRange(row):
         time_string = row["Time"]
@@ -155,14 +139,14 @@ Valid types are album, artist, playlist, track, show, and episode.
 def get_spotify_ids(sp, queries, type='track'):
     if not queries:
         return queries
-
+    
     key = type + 's'
     ids = []
     for q in queries:
         res = sp.search(q, limit=1, offset=0, type=type)
         id = res[key]['items'][0]['id']
         ids.append(id)
-
+    
     return ids
 
 
@@ -177,23 +161,25 @@ Returns a list of tuple (song_title, artist_name)
 def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=None, attributes=None):
     seed_artist_ids = get_spotify_ids(sp, seed_artists, 'artist')
     seed_track_ids = get_spotify_ids(sp, seed_tracks, 'track')
-
+    
     if attributes:
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, **attributes)
     else:
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids)
-
+    
     return get_tracks_from_raw_rec(recs)
 
 
 if __name__ == "__main__":
     sp = init_spotify()
 
+    # cur_track = sp.current_user_playing_track()
+    # print(cur_track)
+
     playlists = get_current_user_playlists(sp)
     print(playlists)
     print()
 
-    # reset folders
     for name, id, num_tracks in playlists:
         folder_name = "lyrics/" + name + "/"
         if os.path.isdir(folder_name):
@@ -203,14 +189,15 @@ if __name__ == "__main__":
     for name, id, num_tracks in playlists:
         playlist_lyrics = get_playlist_lyrics(name, id, num_tracks)
 
-        for (song_title, artist_name), lyrics in playlist_lyrics:
-            save_song(name, song_title, artist_name, lyrics)
+        # for song_title, artist_name, lyrics in playlist_lyrics:
+        #     title = ''.join(ch for ch in song_title if ch.isalnum())
+        #     file_name = song_title + "_" + artist_name + ".txt"
+        #     path = folder_name + file_name
+        #     with open(path, "w") as f:
+        #         f.write(lyrics)
 
         print()
 
-
-    # cur_track = sp.current_user_playing_track()
-    # print(cur_track)
 
 
     # recently_played = get_current_user_recently_played(sp)
