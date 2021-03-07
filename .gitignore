@@ -1,9 +1,8 @@
 lyrics/*
 .cache
-<<<<<<< HEAD
-app/__pycache__
-=======
+__pycache__
 
 *.pyc
 app/__pycache__
->>>>>>> a10c6c36457d2d9c5f7fff7dcc5429fffa4b2469
+
+temp_save/
