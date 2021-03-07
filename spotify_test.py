@@ -42,7 +42,6 @@ def get_tracks_from_raw(data):
         artist_name = p['track']['artists'][0]['name']
 
         played_at = p['played_at']
-        data_for_dataframe.append([song_title, artist_name, played_at])
     return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time'])
 
 def get_sentiment_from_song(title, artist):
@@ -211,7 +210,10 @@ def get_tracks_in_date_range(min_time, max_time, df):
         return min_time < corresonding_time and corresonding_time < max_time
     return df[df.apply(inRange, axis=1)]
 
-# def get_mood_in_date_range(raage, tracks):
+def get_mood_in_date_range(min_time, max_time, tracks):
+    pd = get_tracks_in_date_range(min_time, max_time, tracks)
+    
+
 
 
 def get_tracks_from_raw_rec(data):
