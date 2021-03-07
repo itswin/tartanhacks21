@@ -7,14 +7,14 @@ def analyze_text_sentiment(text):
     response = client.analyze_sentiment(document=document)
 
     sentiment = response.document_sentiment
-    print(sentiment)
     results = dict(
         text=text,
-        score=f"{sentiment.score:.1%}",
-        magnitude=f"{sentiment.magnitude:.1%}",
+        score=sentiment.score,
+        magnitude=sentiment.magnitude,
     )
-    for k, v in results.items():
-        print(f"{k:10}: {v}")
+    # for k, v in results.items():
+    #     print(f"{k:10}: {v}")
+    return results
 
 def classify_text(text):
     client = language.LanguageServiceClient()
@@ -26,3 +26,7 @@ def classify_text(text):
         print("=" * 80)
         print(f"category  : {category.name}")
         print(f"confidence: {category.confidence:.0%}")
+
+if __name__ == '__main__':
+    text = "Bharath is an amazing person"
+    analyze_text_sentiment(text)

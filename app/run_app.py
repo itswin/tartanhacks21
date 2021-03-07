@@ -3,12 +3,13 @@ import base64
 import requests
 import json
 from app import app
+from datetime import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-import spotify_test
+import spotify_test as spt
 
 clientId = "a8bdd721f4804917bef2258bd38e62c2"
 clientSecret = "17248bb726b44503976fdb357cb229d1"
@@ -58,7 +59,13 @@ def spotify_analysis():
 
     sp = spotipy.Spotify(auth = accessToken, auth_manager = auth_manager)
 
-    print(sp.current_user())
-    dataframes = spotify_test.analyze_playlists(sp)
+    # print(sp.current_user())
+    # all_tracks = spt.get_current_user_recently_played(sp)
+    # last_day_tracks = spt.get_tracks_in_date_range(datetime(2021, 3, 6, 0, 0, 0, 0),datetime(2021, 3, 7, 0, 0, 0, 0),all_tracks)
+    information = spt.analyze_playlists(sp)
+    # for curr_dict in information:
+    name = information[0]['name']
+    avg_vals = information[0]['averages']
 
-    return render_template('main.html', username = dataframes[1])
+
+    return render_template('main.html', name = last_day_tracks, avg_vals = avg_vals)
