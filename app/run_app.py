@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import spotify_test as spt
 from flask import Flask, redirect, render_template, request
 import base64
 import requests
@@ -6,10 +10,6 @@ from app import app
 from datetime import datetime
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-import spotify_test as spt
 
 clientId = "a8bdd721f4804917bef2258bd38e62c2"
 clientSecret = "17248bb726b44503976fdb357cb229d1"
@@ -68,4 +68,4 @@ def spotify_analysis():
     avg_vals = information[0]['averages']
 
 
-    return render_template('main.html', name = last_day_tracks, avg_vals = avg_vals)
+    return render_template('main.html', name = name, avg_vals = avg_vals)

@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"access_token": "BQDBnYdfkGlCPMiDeqEF67RaTpyphrc0qFTRXjTmDrQ9CAayFH6-x3orpF42myl1p1CshilPZPDXKDED0UWm6J42KGTm3zPKs3qnihAit0WHIgRsC7E5Z4qeVDKQGc012eIAIF3HhTW48JaVvjjdgMG5GQEO6wI3XHx_Zec", "token_type": "Bearer", "expires_in": 3600, "scope": "playlist-read-collaborative playlist-read-private user-read-currently-playing user-read-recently-played", "expires_at": 1615061425, "refresh_token": "AQA3znq92RJxcVjrFRrHd9Hu1c97iuYKnRiUJRvf2_-WMthlzMT4L-mY97FrKwouBTVt2kFVXNTm2Bc_NauCTUmOMOt_p-MkQ75wDuvlppviX1xH3kvxqFojN0tWummFlkE"}
+=======
+{"access_token": "BQAEOvC2aln9YJMBEyjQqxCiDc7uG2wusX0JYIRe4mVhQVwLJyvtOgJytvVchjiF3tUdPzFmme8nTVILZ0f2jTEkF7WOodgcUOQCtCbSxH_Dh94KaNYWCYnuB1cPaTRYpzFEg4L4oWKcT_yiZPciwhJKcUM1DPN6VJw7TiU", "token_type": "Bearer", "expires_in": 3600, "scope": "playlist-read-collaborative playlist-read-private user-read-currently-playing user-read-recently-played", "expires_at": 1615079147, "refresh_token": "AQA3znq92RJxcVjrFRrHd9Hu1c97iuYKnRiUJRvf2_-WMthlzMT4L-mY97FrKwouBTVt2kFVXNTm2Bc_NauCTUmOMOt_p-MkQ75wDuvlppviX1xH3kvxqFojN0tWummFlkE"}
+>>>>>>> a10c6c36457d2d9c5f7fff7dcc5429fffa4b2469

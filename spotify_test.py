@@ -1,3 +1,4 @@
+import lyrics_getter
 from pprint import pprint
 import time
 import sys
@@ -7,11 +8,9 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 import datetime
-import math
+import random
 
-import lyrics_getter
 import sentiment_analysis
-
 
 '''
 Make sure you run:
@@ -67,13 +66,35 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
         sentiment = 0
     return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
 
-def get_average_values_from_playlist(dataframe):
+def get_emotion_value_from_playlist(zipped, danceability=0, energy=0, tempo=0, valence=0):
+    print("getting new emotion value from playlist")
+    lyrics = lyrics_getter.get_song_lyrics_batch(zipped)
+    # print(lyrics)
+    lyrics = ". ".join([l[1] for l in lyrics])
+    # analysis = sentiment_analysis.analyze_text_sentiment(lyrics)
+
+    #junk code for now to not use up cloud requests (CHANGE FOR REAL THING)
+    sign = 1
+    if (random.random()) > 0.5:
+        sign = -1
+    analysis = {'score' : random.random() * sign, 'magnitude' : random.random()}
+
+    return analysis['score'] * analysis['magnitude']
+
+def get_average_values_from_playlist(dataframe, zipped):
     res = {}
-    res['Danceability'] = dataframe['Danceability'].mean()
-    res['Energy'] = dataframe['Energy'].mean()
-    res['Tempo'] = dataframe['Tempo'].mean()
-    res['Valence'] = dataframe['Valence'].mean()
-    res['Emotion Score'] = dataframe['Emotion Score'].mean()
+    avg_danceability = dataframe['Danceability'].mean()
+    avg_energy = dataframe['Energy'].mean()
+    avg_tempo = dataframe['Tempo'].mean()
+    avg_valence = dataframe['Valence'].mean()
+    avg_emotion = get_emotion_value_from_playlist(zipped, avg_danceability, avg_energy, avg_tempo, avg_valence)
+
+    res['Danceability'] = avg_danceability
+    res['Energy'] = avg_energy
+    res['Tempo'] = avg_tempo
+    res['Valence'] = avg_valence
+    res['Emotion Score'] = avg_emotion
+
     return res
 
 def get_playlist_tracks_from_raw(data, sp):
@@ -97,9 +118,9 @@ def get_playlist_tracks_from_raw(data, sp):
         energy = song_analysis[0]['energy']
         tempo = song_analysis[0]['tempo']
         valence = song_analysis[0]['valence']
-        emotion_score = get_emotion_value_from_song(song_title, artist_name, danceability, energy, tempo, valence)
-        data_for_dataframe.append([song_title, artist_name, danceability, energy, tempo, valence, emotion_score])
-    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Danceability', 'Energy', 'Tempo', 'Valence', 'Emotion Score'])
+        # emotion_score = get_emotion_value_from_song(song_title, artist_name, danceability, energy, tempo, valence)
+        data_for_dataframe.append([song_title, artist_name, danceability, energy, tempo, valence])
+    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Danceability', 'Energy', 'Tempo', 'Valence'])
 
 def get_playlist_tracks(sp, id, num_tracks):
     TRACK_REQUEST_LIMIT = 100
@@ -168,7 +189,12 @@ def analyze_playlists(sp):
         num_tracks = playlist['tracks']['total']
         name = playlist['name']
         curr_dataframe = get_playlist_tracks(sp, id, num_tracks)
-        curr_avg_vals = get_average_values_from_playlist(curr_dataframe)
+
+        names = curr_dataframe['Name'].tolist()
+        artists = curr_dataframe['Artist'].tolist()
+        zipped = list(zip(names, artists))
+
+        curr_avg_vals = get_average_values_from_playlist(curr_dataframe, zipped)
         curr_dict = {'name' : name, 'dataframe' : curr_dataframe, 'averages' : curr_avg_vals}
         information.append(curr_dict)
 
