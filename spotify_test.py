@@ -9,6 +9,7 @@ from spotipy.oauth2 import SpotifyOAuth
 import pandas as pd
 import datetime
 import random
+import math
 
 import sentiment_analysis
 
@@ -26,6 +27,63 @@ def init_spotify():
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
     return sp
+def create_vector_values(sp,txt):
+    song_list, artist_list = None, None
+    with open("reference_songs/" + txt + ".txt", "r") as f:
+        lines = f.readlines()
+        song_list = [x.strip() for x in lines[0::2]]
+        artist_list = [x.strip() for x in lines[1::2]]
+    track_ids = []
+    for index in range(len(song_list)):
+        track, artist = song_list[index], artist_list[index]
+        
+        track_id = sp.search(q='track:' + track, limit=1,type='track')
+        track_id = track_id['tracks']['items'][0]['id']
+        track_ids.append(track_id)
+    main_frame = pd.DataFrame()
+    main_frame['Song ID'] = track_ids
+    final_audio_features = []
+    all_song_ids = main_frame['Song ID']
+    num_songids = len(all_song_ids)
+    # print("song ids:" + str(num_songids))
+    TRACK_REQUEST_LIMIT = 100
+    for index in range(0, num_songids, TRACK_REQUEST_LIMIT):
+        print(index)
+        curr_songids = all_song_ids[index:min(num_songids, index + TRACK_REQUEST_LIMIT)]
+        features = sp.audio_features(curr_songids)
+        final_audio_features += features
+
+    danceabilities = [features['danceability'] for features in final_audio_features]
+    energies = [features['energy'] for features in final_audio_features]
+    tempos = [features['tempo'] for features in final_audio_features]
+    valences = [features['valence'] for features in final_audio_features]
+
+    # print(len(all_tracks))
+    # print(len(danceabilities))
+
+    main_frame['Danceability'] = danceabilities
+    main_frame['Energy'] = energies
+    main_frame['Tempo'] = tempos
+    main_frame['Valence'] = valences
+    return (main_frame['Danceability'].mean(),main_frame['Energy'].mean(), main_frame['Tempo'].mean(),main_frame['Valence'].mean())
+
+def classify_song_emotion(song_values): #song values is the tuple of the values of the song we are trying to classify in order "Danceability", "Energy", "Tempo", "Valence"
+    def error(v1, v2):
+        temp = 0
+        for i in range(len(v1)):
+            currV1 = v1[i]
+            currV2 = v2[i]
+            temp += abs(currV1 - currV2)
+        return math.sqrt(temp)
+
+    classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Angry": (0.6049, 0.7454500000000001, 108.40515, 0.5322499999999999)}
+    best_error = float('inf')
+    best_emotion = None
+    for key, value in classifier_dict.items():
+        if error(value, song_values) < best_error:
+            best_error = error(value, song_values)
+            best_emotion = key
+    return best_emotion
 
 
 def get_tracks_from_raw(sp, data):
@@ -43,14 +101,14 @@ def get_tracks_from_raw(sp, data):
         id = p['track']['id']
         data_for_dataframe.append([song_title, artist_name, played_at,id])
 
-    main_frame =pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'Song ID', ])
+    main_frame =pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'Song ID'])
     
     final_audio_features = []
     all_song_ids = main_frame['Song ID']
     num_songids = len(all_song_ids)
     # print("song ids:" + str(num_songids))
     for index in range(0, num_songids, TRACK_REQUEST_LIMIT):
-        print(index)
+        # print(index)
         curr_songids = all_song_ids[index:min(num_songids, index + TRACK_REQUEST_LIMIT)]
         features = sp.audio_features(curr_songids)
         final_audio_features += features
@@ -92,22 +150,27 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
         sentiment = 0
     return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
 
-def get_emotion_value_from_playlist(zipped, danceability=0, energy=0, tempo=0, valence=0):
+def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo=0, valence=0):
     # print("getting new emotion value from playlist")
-    lyrics = lyrics_getter.get_song_lyrics_batch(zipped)
-    # print(lyrics)
-    lyrics = ". ".join([l[1] for l in lyrics])
-    # analysis = sentiment_analysis.analyze_text_sentiment(lyrics)
+    analysis = None
+    callSentimentAnalysis = False
+    if zipped is not None and callSentimentAnalysis:
+        lyrics = lyrics_getter.get_song_lyrics_batch(zipped)
+        # print(lyrics)
+        lyrics = ". ".join([l[1] for l in lyrics])
+        analysis = sentiment_analysis.analyze_text_sentiment(lyrics)
+    else:
+        #junk code for now to not use up cloud requests (CHANGE FOR REAL THING)
+        sign = 1
+        if (random.random()) > 0.5:
+            sign = -1
+        analysis = {'score' : random.random() * sign, 'magnitude' : random.random()}
 
-    #junk code for now to not use up cloud requests (CHANGE FOR REAL THING)
-    sign = 1
-    if (random.random()) > 0.5:
-        sign = -1
-    analysis = {'score' : random.random() * sign, 'magnitude' : random.random()}
+    sentiment = analysis['score'] * analysis['magnitude']
 
-    return analysis['score'] * analysis['magnitude']
+    return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
 
-def get_average_values_from_playlist(dataframe, zipped):
+def get_average_values_from_playlist(dataframe, zipped=None):
     res = {}
     avg_danceability = dataframe['Danceability'].mean()
     avg_energy = dataframe['Energy'].mean()
@@ -207,6 +270,15 @@ def get_current_user_recently_played(sp):
 
     return recently_played
 
+def analyze_user_recently_played(sp):
+    tracks_dataframe = get_current_user_recently_played(sp)
+    curr_avg_vals = get_average_values_from_playlist(tracks_dataframe)
+    curr_emotion = classify_song_emotion((curr_avg_vals['Danceability'],
+                                              curr_avg_vals['Energy'],
+                                              curr_avg_vals['Tempo'],
+                                              curr_avg_vals['Valence']))
+    curr_dict = {'averages' : curr_avg_vals, 'emotion' : curr_emotion}
+    return curr_dict
 
 def get_playlist_lyrics(name, id, num_tracks):
     playlist_lyrics = []
@@ -245,7 +317,11 @@ def analyze_playlists(sp):
         zipped = list(zip(names, artists))
 
         curr_avg_vals = get_average_values_from_playlist(curr_dataframe, zipped)
-        curr_dict = {'name' : name, 'dataframe' : curr_dataframe, 'averages' : curr_avg_vals}
+        curr_emotion = classify_song_emotion((curr_avg_vals['Danceability'],
+                                              curr_avg_vals['Energy'],
+                                              curr_avg_vals['Tempo'],
+                                              curr_avg_vals['Valence']))
+        curr_dict = {'name' : name, 'dataframe' : curr_dataframe, 'averages' : curr_avg_vals, 'emotion' : curr_emotion}
         information.append(curr_dict)
 
     return information

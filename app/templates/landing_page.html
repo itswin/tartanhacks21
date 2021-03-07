@@ -3,7 +3,7 @@
 <title>Spot Your Mood!</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="static/css/landing_page_style.css?version=2">
+<link rel="stylesheet" href="static/css/landing_page_style.css?version=3">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins">
 <style>
@@ -22,11 +22,10 @@ body {font-size:16px;}
   </div>
   <div class="w3-bar-block">
     <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
-    <a href="#showcase" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Showcase</a> 
-    <a href="#services" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Services</a> 
-    <a href="#designers" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Designers</a> 
-    <a href="#packages" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Packages</a> 
-    <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Contact</a>
+    <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">About</a>
+    <a href="#currentmood" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Learn Your Current Mood</a> 
+    <a href="#playlistinfo" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Learn About Your Playlists</a> 
+    <a href="#designplaylist" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Design Your Own Playlist</a>
   </div>
 </nav>
 
@@ -42,73 +41,82 @@ body {font-size:16px;}
 <!-- !PAGE CONTENT! -->
 <div class="w3-main" style="margin-left:340px;margin-right:40px">
 
-  <!-- Header -->
-  <div class="w3-container" style="margin-top:80px" id="showcase">
-    <h1 class="w3-jumbo"><b>Learn Your Mood From Your Spotify History</b></h1>
+    <div class="w3-container" id="about" style="margin-top:75px">
+        <h1 class="w3-jumbo"><b>Spotify History Through a New Lens</b></h1>
+        <h1 class="w3-xxxlarge w3-text-red"><b>About.</b></h1>
+        <hr style="width:50px;border:5px solid red" class="w3-round">
+        <p>Spot Your Mood is a spotify companion extension that allows you to learn more about your mood over time!</p>
+        <p>We display mood information about your current listening habits, as well as information about each of 
+            your playlists! We also encourage you to explore the "Design Your Own Playlist" section, where you can 
+            tweak certain music parameters, and we will generate a playlist for you that matches how you're feeling!
+        </p>
+      </div>
+
+    <div class="w3-container" style="margin-top:80px" id="currentmood">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Current Mood.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <p class="w3-xxxlarge w3-text-red" style="text-align: center;">
+        You Are Currenly {{recently_played_info['emotion']}}! Learn more below.</p>
+    </div>
+
+    <table class = "styled-table">
+        <caption>Table Legend:<br>
+            Danceability: On a range from 'not at all danceable' to 'disco'<br>
+            Energy: On a range from 'chill' to 'no chill'<br>
+            Tempo: On a range from 'slow' to 'fast'<br>
+            What Mood are You In Right Now?: The mood of your recent history based on our classification and sentiment analysis algorithm :)
+        </caption>
+        <thead>
+            <tr>
+                <th>Danceability</th>
+                <th>Energy</th>
+                <th>Tempo</th>
+                <th>What Mood are You In?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> {{ recently_played_info['averages']['Danceability'] }} </td>
+                <td> {{ recently_played_info['averages']['Energy'] }} </td>
+                <td> {{ recently_played_info['averages']['Tempo'] }} </td>
+                <td> {{ recently_played_info['emotion'] }} </td>
+            </tr>
+        </tbody>
+    </table>
+
+  <div class="w3-container" style="margin-top:80px" id="playlistinfo">
     <h1 class="w3-xxxlarge w3-text-red"><b>Playlist Classification.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
   </div>
-  
-  <!-- Photo grid (modal) -->
-  <!-- <div class="w3-row-padding">
-    <div class="w3-half">
-      <img src="/w3images/kitchenconcrete.jpg" style="width:100%" onclick="onClick(this)" alt="Concrete meets bricks">
-      <img src="/w3images/livingroom.jpg" style="width:100%" onclick="onClick(this)" alt="Light, white and tight scandinavian design">
-      <img src="/w3images/diningroom.jpg" style="width:100%" onclick="onClick(this)" alt="White walls with designer chairs">
-    </div>
-
-    <div class="w3-half">
-      <img src="/w3images/atrium.jpg" style="width:100%" onclick="onClick(this)" alt="Windows for the atrium">
-      <img src="/w3images/bedroom.jpg" style="width:100%" onclick="onClick(this)" alt="Bedroom and office in one space">
-      <img src="/w3images/livingroom2.jpg" style="width:100%" onclick="onClick(this)" alt="Scandinavian design">
-    </div>
-  </div> -->
 
     <table class = "styled-table">
-        <caption>Table Legend:<br>Danceability: On a range from 'not at all danceable' to 'disco'</caption>
+        <caption>Table Legend:<br>
+                Danceability: On a range from 'not at all danceable' to 'disco'<br>
+                Energy: On a range from 'chill' to 'no chill'<br>
+                Tempo: On a range from 'slow' to 'fast'<br>
+                What Mood is Your Playlist: The mood of your playlist based on our classification and sentiment analysis algorithm :)
+        </caption>
         <thead>
             <tr>
                 <th>Your Playlist Name</th>
                 <th>Danceability</th>
                 <th>Energy</th>
                 <th>Tempo</th>
-                <th>Valence</th>
-                <th>Emotion</th>
+                <th>What Mood is Your Playlist?</th>
             </tr>
         </thead>
         <tbody>
-            {% for info in information %}
+            {% for info in playlist_info %}
                 <tr>
                     <th> {{ info['name'] }} </th>
                     <td> {{ info['averages']['Danceability'] }} </td>
                     <td> {{ info['averages']['Energy'] }} </td>
                     <td> {{ info['averages']['Tempo'] }} </td>
-                    <td> {{ info['averages']['Valence'] }} </td>
-                    <td> {{ info['averages']['Emotion Score'] }} </td>
+                    <td> {{ info['emotion'] }} </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-
-  <!-- Modal for full size images on click-->
-  <div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
-    <span class="w3-button w3-black w3-xxlarge w3-display-topright">×</span>
-    <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
-      <img id="img01" class="w3-image">
-      <p id="caption"></p>
-    </div>
-  </div>
-
-  <!-- Services -->
-  <div class="w3-container" id="services" style="margin-top:75px">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Services.</b></h1>
-    <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>We are a interior design service that focus on what's best for your home and what's best for you!</p>
-    <p>Some text about our services - what we do and what we offer. We are lorem ipsum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
-    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor
-    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-  </div>
   
   <!-- Designers -->
   <div class="w3-container" id="designers" style="margin-top:75px">

@@ -62,12 +62,16 @@ def spotify_analysis():
     sp = spotipy.Spotify(auth = accessToken, auth_manager = auth_manager)
 
     # print(sp.current_user())
-    # all_tracks = spt.get_current_user_recently_played(sp)
+    recently_played_info = spt.analyze_user_recently_played(sp)
     # last_day_tracks = spt.get_tracks_in_date_range(datetime(2021, 3, 6, 0, 0, 0, 0),datetime(2021, 3, 7, 0, 0, 0, 0),all_tracks)
-    information = spt.analyze_playlists(sp)
+    playlist_info = spt.analyze_playlists(sp)
     # for curr_dict in information:
     # name = information[0]['name']
-    # avg_vals = information[0]['averages']
+    # # avg_vals = information[0]['averages']
+    # emotions_list = [["Danceability", "Energy", "Tempo", "Valence"]]
+    # emotions_list.append(spt.create_vector_values(sp, "happy_songs"))
+    # emotions_list.append(spt.create_vector_values(sp, "sad_songs"))
+    # emotions_list.append(spt.create_vector_values(sp, "angry_songs"))
 
 
-    return render_template('landing_page.html', information = information)
+    return render_template('landing_page.html', playlist_info = playlist_info, recently_played_info = recently_played_info)
