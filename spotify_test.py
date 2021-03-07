@@ -37,7 +37,7 @@ def create_vector_values(sp,txt):
     track_ids = []
     for index in range(len(song_list)):
         track, artist = song_list[index], artist_list[index]
-        
+
         track_id = sp.search(q='track:' + track, limit=1,type='track')
         track_id = track_id['tracks']['items'][0]['id']
         track_ids.append(track_id)
@@ -103,7 +103,7 @@ def get_tracks_from_raw(sp, data):
         data_for_dataframe.append([song_title, artist_name, played_at,id])
 
     main_frame =pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'Song ID'])
-    
+
     final_audio_features = []
     all_song_ids = main_frame['Song ID']
     num_songids = len(all_song_ids)
@@ -168,7 +168,7 @@ def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo
         MAX_BATCH_LEN = 3
         sampled_lyrics = random.sample(lyrics, min(MAX_SAMPLE_LEN, len(lyrics)))
         batched_lyrics = [". ".join(sampled_lyrics[i:i+MAX_BATCH_LEN]) for i in range (0, len(sampled_lyrics), MAX_BATCH_LEN)]
-        
+
         analyses = [sentiment_analysis.analyze_text_sentiment_workaround(batch) for batch in batched_lyrics]
         analysis = {'score' : sum(res['score'] for res in analyses) / len(analyses),
                     'magnitude' :  sum(res['magnitude'] for res in analyses) / len(analyses)}
@@ -233,9 +233,11 @@ def get_playlist_tracks(sp, id, num_tracks):
     for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
         playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
         playlist_tracks = get_playlist_tracks_from_raw(playlist_track_data, sp)
-        if all_tracks is None: all_tracks = playlist_tracks
-        else: all_tracks.append(playlist_tracks, ignore_index=True)
-    
+        if all_tracks is None:
+            all_tracks = playlist_tracks
+        else:
+            all_tracks = all_tracks.append(playlist_tracks, ignore_index=True)
+
     final_audio_features = []
     all_song_ids = all_tracks['Song ID']
     num_songids = len(all_song_ids)
@@ -293,14 +295,15 @@ def analyze_user_recently_played(sp):
     curr_dict = {'averages' : curr_avg_vals, 'emotion' : curr_emotion}
     return curr_dict
 
-def get_playlist_lyrics(name, id, num_tracks):
+def get_playlist_lyrics(sp, name, id, num_tracks):
     playlist_lyrics = []
     print(name)
     tracks = get_playlist_tracks(sp, id, num_tracks)
     print("[FOUND SONGS]", len(tracks), "songs")
 
-    for track_item in tracks.iterrows():
-        song_title, artist_name, played_at = track_item["Name"], track_item["Artist"], track_item["Time"]
+    for index, track_item in tracks.iterrows():
+        print(track_item)
+        song_title, artist_name = track_item["Name"], track_item["Artist"]
         lyrics = lyrics_getter.get_song_lyrics(song_title, artist_name)
         if lyrics is not None:
             playlist_lyrics += [(song_title, artist_name, lyrics)]
@@ -335,12 +338,12 @@ def analyze_playlists(sp):
                                               curr_avg_vals['Tempo'],
                                               curr_avg_vals['Valence']))
         curr_dict = {'name' : name, 'dataframe' : curr_dataframe, 'averages' : curr_avg_vals, 'emotion' : curr_emotion}
-        information.append(curr_dict)
+        information = information.append(curr_dict)
 
     return information
 
 def add_to_tracks(df, new_tracks):
-    df.append(new_tracks, ignore_index = True)
+    df = df.append(new_tracks, ignore_index = True)
     return df
 
 def get_tracks_in_date_range(min_time, max_time, df):
@@ -352,7 +355,7 @@ def get_tracks_in_date_range(min_time, max_time, df):
 
 def get_mood_in_date_range(min_time, max_time, tracks):
     pd = get_tracks_in_date_range(min_time, max_time, tracks)
-    
+
 
 
 
@@ -416,6 +419,6 @@ if __name__ == "__main__":
         os.makedirs(folder_name)
 
     for name, id, num_tracks in playlists:
-        playlist_lyrics = get_playlist_lyrics(name, id, num_tracks)
+        playlist_lyrics = get_playlist_lyrics(sp, name, id, num_tracks)
 
         print()
