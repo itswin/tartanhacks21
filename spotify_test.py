@@ -157,7 +157,7 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
         sentiment = 0
     return calculate_emotion(sentiment, danceability, energy, tempo, valence)
 
-# Change to True to execute sentiment analysis ONCE
+# Change to True to execute sentiment analysis maxSentimentCalls times
 callSentimentAnalysis = True
 maxSentimentCalls = 5
 sentimentCalls = 0
@@ -183,7 +183,10 @@ def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo
         print("analyzing sentiment")
         # analyses = [sentiment_analysis.analyze_text_sentiment_workaround(batch) for batch in batched_lyrics]
         analyses = sentiment_analysis.analyze_text_sentiment_batch(batched_lyrics)
-        analysis = {'score' : sum(res['score'] for res in analyses) / len(analyses),
+        if len(analyses) == 0:
+            analysis = {'score': 0, 'magnitude': 0}
+        else:
+            analysis = {'score' : sum(res['score'] for res in analyses) / len(analyses),
                     'magnitude' :  sum(res['magnitude'] for res in analyses) / len(analyses)}
     else:
         #junk code for now to not use up cloud requests (CHANGE FOR REAL THING)
