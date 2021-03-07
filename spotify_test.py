@@ -66,7 +66,8 @@ def create_vector_values(sp,txt):
     main_frame['Energy'] = energies
     main_frame['Tempo'] = tempos
     main_frame['Valence'] = valences
-    return (main_frame['Danceability'].mean(),main_frame['Energy'].mean(), main_frame['Tempo'].mean(),main_frame['Valence'].mean())
+    d = {'Danceability': main_frame['Danceability'].mean(),'Energy': main_frame['Energy'].mean(), 'Tempo': main_frame['Tempo'].mean(),'Valence': main_frame['Valence'].mean()}
+    return d
 
 def classify_song_emotion(song_values): #song values is the tuple of the values of the song we are trying to classify in order "Danceability", "Energy", "Tempo", "Valence"
     def error(v1, v2):
@@ -77,7 +78,7 @@ def classify_song_emotion(song_values): #song values is the tuple of the values 
             temp += abs((currV1 - currV2))**2
         return math.sqrt(temp)
 
-    classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Angry": (0.6049, 0.7454500000000001, 108.40515, 0.5322499999999999)}
+    classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Hype": (0.601590909090909, 0.7075454545454546, 128.5876363636363, 0.44953181818181825)}
     best_error = float('inf')
     best_emotion = None
     for key, value in classifier_dict.items():
