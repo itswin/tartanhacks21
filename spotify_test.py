@@ -74,7 +74,7 @@ def classify_song_emotion(song_values): #song values is the tuple of the values 
         for i in range(len(v1)):
             currV1 = v1[i]
             currV2 = v2[i]
-            temp += abs((currV1 - currV2) / currV2)**2
+            temp += abs((currV1 - currV2))**2
         return math.sqrt(temp)
 
     classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Angry": (0.6049, 0.7454500000000001, 108.40515, 0.5322499999999999)}
@@ -164,14 +164,13 @@ def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo
     analysis = None
     if zipped is not None and callSentimentAnalysis:
         callSentimentAnalysis = False
-        lyrics = lyrics_getter.get_song_lyrics_batch(zipped)
-        # print(lyrics)
-        lyrics = [l[1] for l in lyrics]
 
         # 25, 5
         MAX_SAMPLE_LEN = 6
         MAX_BATCH_LEN = 3
-        sampled_lyrics = random.sample(lyrics, min(MAX_SAMPLE_LEN, len(lyrics)))
+        sampled_zipped = random.sample(zipped, min(MAX_SAMPLE_LEN, len(zipped)))
+        sampled_lyrics = lyrics_getter.get_song_lyrics_batch(sampled_zipped)
+        sampled_lyrics = [l[1] for l in sampled_lyrics]
         batched_lyrics = [". ".join(sampled_lyrics[i:i+MAX_BATCH_LEN]) for i in range (0, len(sampled_lyrics), MAX_BATCH_LEN)]
 
         analyses = [sentiment_analysis.analyze_text_sentiment_workaround(batch) for batch in batched_lyrics]
