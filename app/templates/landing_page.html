@@ -93,7 +93,7 @@ body {font-size:16px;}
   <div class="w3-container" style="margin-top:80px" id="playlistinfo">
     <h1 class="w3-xxxlarge w3-text-red"><b>Mood History.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <img style="margin:auto" align="center" src="/mood_graph.png"/>
+    <img style="margin-left:auto; margin-right:auto; width: 50%; display:block;" src="/mood_graph.png"/>
   </div>
 
   <div class="w3-container" style="margin-top:80px" id="playlistinfo">
@@ -166,9 +166,15 @@ body {font-size:16px;}
         </p>
         <p>{{wtf.form_field(form.genre)}}</p>
         <p>{{wtf.form_field(form.limit)}}</p> -->
-        <p>{{wtf.quick_form(form)}}</p> 
+        <p>{{wtf.quick_form(form)}}</p>
       </div>
 
+      <p>
+        {% if form_submit_msg['playlist_url'] %}
+        <a href={{form_submit_msg['playlist_url']}} target="_blank" style="color:blue"><p style="text-align:center;">Playlist URL</p></a> 
+        {% endif %}
+      </p> 
+      {% if form_submit_msg['recommendations'] %}
       <table class = "styled-table">
         <thead>
             <tr>
@@ -178,15 +184,16 @@ body {font-size:16px;}
             </tr>
         </thead>
         <tbody>
-            {% for info in form_submit_msg %}
+            {% for info in form_submit_msg['recommendations'] %}
                 <tr>
-                    <th> {{ info[0] }} </th>
-                    <td> {{ info[1] }} </td>
-                    <td> <a href={{ info[2] }} target="_blank" style="color:blue">Click Here!</a> </td>
+                    <th> {{ info['title'] }} </th>
+                    <td> {{ info['artist'] }} </td>
+                    <td> <a href={{ info['link'] }} target="_blank" style="color:blue">Click Here!</a> </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 
 <!-- End page content -->
 </div>
