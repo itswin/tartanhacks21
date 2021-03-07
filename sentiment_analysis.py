@@ -75,4 +75,5 @@ def classify_text(text):
 
 if __name__ == '__main__':
     text = "Bharath is an amazing person"
-    # analysis = analyze_text_sentiment(text)
+    analysis = analyze_text_sentiment_workaround(text)
+    print(analysis)
