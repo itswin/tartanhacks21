@@ -74,7 +74,7 @@ def classify_song_emotion(song_values): #song values is the tuple of the values 
         for i in range(len(v1)):
             currV1 = v1[i]
             currV2 = v2[i]
-            temp += abs(currV1 - currV2)
+            temp += abs((currV1 - currV2) / currV2)**2
         return math.sqrt(temp)
 
     classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Angry": (0.6049, 0.7454500000000001, 108.40515, 0.5322499999999999)}
@@ -144,12 +144,17 @@ def get_sentiment_from_song(title, artist):
 
     return analysis['score'] * analysis['magnitude']
 
+
+def calculate_emotion(sentiment, danceability, energy, tempo, valence):
+    return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo / 100) + (valence * 3)
+
+
 def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0, valence=0):
     #possibly update with better heuristic
     sentiment = get_sentiment_from_song(title, artist)
     if sentiment is None:
         sentiment = 0
-    return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
+    return calculate_emotion(sentiment, danceability, energy, tempo, valence)
 
 # Change to True to execute sentiment analysis ONCE
 callSentimentAnalysis = False
@@ -181,7 +186,7 @@ def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo
 
     sentiment = analysis['score'] * analysis['magnitude']
 
-    return (sentiment * 2) + (danceability * 3) + (energy * 3) + (tempo * 3) + (valence * 3)
+    return calculate_emotion(sentiment, danceability, energy, tempo, valence)
 
 def get_average_values_from_playlist(dataframe, zipped=None):
     res = {}
@@ -229,7 +234,6 @@ def get_playlist_tracks(sp, id, num_tracks):
 
     all_tracks = None
     playlist_tracks = None
-
     for index in range(0, num_tracks, TRACK_REQUEST_LIMIT):
         playlist_track_data = sp.playlist_tracks(id, limit=TRACK_REQUEST_LIMIT, offset=index)
         playlist_tracks = get_playlist_tracks_from_raw(playlist_track_data, sp)
@@ -326,8 +330,8 @@ def analyze_playlists(sp):
         id = playlist['id']
         num_tracks = playlist['tracks']['total']
         name = playlist['name']
-        curr_dataframe = get_playlist_tracks(sp, id, num_tracks)
-
+        if(num_tracks != 0): curr_dataframe = get_playlist_tracks(sp, id, num_tracks)
+        else: continue
         names = curr_dataframe['Name'].tolist()
         artists = curr_dataframe['Artist'].tolist()
         zipped = list(zip(names, artists))
@@ -406,20 +410,94 @@ def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=Non
     print(recs)
     return get_tracks_from_raw_rec(recs)
 
+
+
+
+def add_timestamps(df):
+    start_date = datetime.datetime.now() + datetime.timedelta(days=-df.shape[0])
+    df['Time'] = [start_date + datetime.timedelta(days=i) for i in range(df.shape[0])]
+
+
+def add_sentiment_data(df, all_lyrics):
+    sent_score = [random.random() for l in all_lyrics]
+    sent_mag = [random.random() for l in all_lyrics]
+
+    '''
+    sent_score = []
+    sent_mag = []
+
+    batch_size = 10
+    for i in range(0, len(all_lyrics), batch_size):
+        res = sentiment_analysis.analyze_text_sentiment_batch(all_lyrics[i: min(i+batch_size, len(all_lyrics))])
+        sent_score += [r['score'] for r in res]
+        sent_mag += [r['magnitude'] for r in res]
+        # save_df = pd.DataFrame(data=[sent_score, sent_mag])
+        # save_df.to_csv("temp_save/temp" + str(i) + ".csv")
+    '''
+
+    df['sentiment_score'] = sent_score
+    df['sentiment_mag'] = sent_mag
+
+
+
+def get_recent_moods(sp):
+    df = get_current_user_recently_played(sp)
+    # print("orig")
+    # print(df)
+
+    # get lyrics
+    tracks = [(row['Name'], row['Artist']) for i, row in df.iterrows()]
+    all_lyrics = lyrics_getter.get_song_lyrics_batch(tracks)
+
+    raw_lyrics = []
+
+    lyrics_dict = {l[0][0]: l[1] for l in all_lyrics}
+
+    all_data = []
+    for index, row in df.iterrows():
+        if row['Name'] in lyrics_dict:
+            new_row = list(row)
+            all_data += [new_row]
+            raw_lyrics += [lyrics_dict[row['Name']]]
+
+    df = pd.DataFrame(data=all_data, columns=df.columns)
+
+    add_timestamps(df)
+    # print("timestamps")
+    # print(df)
+    # df.to_csv("example_data_timed.csv")
+
+    add_sentiment_data(df, raw_lyrics)
+    # print("senti")
+    # print(df)
+
+    times = [row['Time'] for i,row in df.iterrows()]
+    moods = [calculate_emotion(row['sentiment_score'] * row['sentiment_mag'], row['Danceability'], row['Energy'], row['Tempo'], row['Valence'])
+                for i,row in df.iterrows()]
+
+
+    return pd.DataFrame({"Time": times, "Mood":moods})
+
+
+
 if __name__ == "__main__":
     sp = init_spotify()
 
-    playlists = get_current_user_playlists(sp)
-    print(playlists)
-    print()
+    mood_data = get_recent_moods(sp)
 
-    for name, id, num_tracks in playlists:
-        folder_name = "lyrics/" + name + "/"
-        if os.path.isdir(folder_name):
-            shutil.rmtree(folder_name)
-        os.makedirs(folder_name)
+    print(mood_data)
 
-    for name, id, num_tracks in playlists:
-        playlist_lyrics = get_playlist_lyrics(sp, name, id, num_tracks)
-
-        print()
+    # playlists = get_current_user_playlists(sp)
+    # print(playlists)
+    # print()
+    #
+    # for name, id, num_tracks in playlists:
+    #     folder_name = "lyrics/" + name + "/"
+    #     if os.path.isdir(folder_name):
+    #         shutil.rmtree(folder_name)
+    #     os.makedirs(folder_name)
+    #
+    # for name, id, num_tracks in playlists:
+    #     playlist_lyrics = get_playlist_lyrics(sp, name, id, num_tracks)
+    #
+    #     print()

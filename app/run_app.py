@@ -4,7 +4,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import spotify_test as spt
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, Response
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 import base64
@@ -38,6 +38,13 @@ limit_map = dict([(1,"10"),
             (8,"80"),
             (9,"90"),
             (10,"100")])
+
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import base64
+import io
 
 class RecommendationForm(FlaskForm):
     # acoustic = RadioField('Acoustic Level:', choices = [(1,"10%")])
@@ -89,6 +96,7 @@ authQueryParams = {
 
 auth_manager = spotipy.oauth2.SpotifyOAuth(client_id = clientId, client_secret = clientSecret, redirect_uri = redirectUri, scope = scope, show_dialog = True)
 token_info = auth_manager.get_cached_token()
+sp = None
 
 @app.route('/')
 def index():
@@ -103,7 +111,7 @@ def spotify_auth():
 def spotify_analysis():
     global refreshToken
     global token_info
-    sp = None
+    global sp
     # print(auth_manager.is_token_expired(token_info))
     if (request.method == 'POST'):
         print("here inside post request")
@@ -180,6 +188,39 @@ def spotify_analysis():
     print("here2")
     # form = None
 
+
+    for info in playlist_info:
+        info['averages']['Danceability'] = round(info['averages']['Danceability'], 2)
+        info['averages']['Energy'] = round(info['averages']['Energy'], 2)
+        info['averages']['Tempo'] = round(info['averages']['Tempo'], 2)
+
+    recently_played_info['averages']['Danceability'] = round(recently_played_info['averages']['Danceability'], 2)
+    recently_played_info['averages']['Energy'] = round(recently_played_info['averages']['Energy'], 2)
+    recently_played_info['averages']['Tempo'] = round(recently_played_info['averages']['Tempo'], 2)
+
     return render_template('landing_page.html', playlist_info = playlist_info, recently_played_info = recently_played_info,
                                                 form = form,
                                                 form_submit_msg = message)
+
+@app.route('/mood_graph.png')
+def get_mood_graph():
+    global sp
+
+    # create recently played mood graph
+    df = spt.get_recent_moods(sp)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    df.plot(x='Time', y='Mood', ax=ax, color='#f44336')
+    plt.xlabel("Date")
+    plt.ylabel("Mood")
+
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
+
+@app.route('/asdf')
+def hello():
+    print("got here in hello")
