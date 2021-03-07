@@ -158,23 +158,31 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
     return calculate_emotion(sentiment, danceability, energy, tempo, valence)
 
 # Change to True to execute sentiment analysis ONCE
-callSentimentAnalysis = False
+callSentimentAnalysis = True
+maxSentimentCalls = 5
+sentimentCalls = 0
 def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo=0, valence=0):
     global callSentimentAnalysis
-    # print("getting new emotion value from playlist", callSentimentAnalysis)
+    global sentimentCalls
+    global maxSentimentCalls
+    print("getting new emotion value from playlist", callSentimentAnalysis)
     analysis = None
-    if zipped is not None and callSentimentAnalysis:
-        callSentimentAnalysis = False
+    if zipped is not None and callSentimentAnalysis and sentimentCalls < maxSentimentCalls:
+        # callSentimentAnalysis = False
+        sentimentCalls += 1
 
         # 25, 5
         MAX_SAMPLE_LEN = 6
         MAX_BATCH_LEN = 3
         sampled_zipped = random.sample(zipped, min(MAX_SAMPLE_LEN, len(zipped)))
+        print("Getting lyrics")
         sampled_lyrics = lyrics_getter.get_song_lyrics_batch(sampled_zipped)
         sampled_lyrics = [l[1] for l in sampled_lyrics]
         batched_lyrics = [". ".join(sampled_lyrics[i:i+MAX_BATCH_LEN]) for i in range (0, len(sampled_lyrics), MAX_BATCH_LEN)]
 
-        analyses = [sentiment_analysis.analyze_text_sentiment_workaround(batch) for batch in batched_lyrics]
+        print("analyzing sentiment")
+        # analyses = [sentiment_analysis.analyze_text_sentiment_workaround(batch) for batch in batched_lyrics]
+        analyses = sentiment_analysis.analyze_text_sentiment_batch(batched_lyrics)
         analysis = {'score' : sum(res['score'] for res in analyses) / len(analyses),
                     'magnitude' :  sum(res['magnitude'] for res in analyses) / len(analyses)}
     else:
@@ -209,13 +217,13 @@ def get_playlist_tracks_from_raw(data, sp):
     data_for_dataframe = []
     for p in data['items']:
         if p['track'] is None:
-            print("[BAD]")
+            # print("[BAD]")
             continue
         song_title = p['track']['name']
         artist_name = p['track']['artists'][0]['name']
         song_id = p['track']['id']
         if not song_id:
-            print("[BAD]")
+            # print("[BAD]")
             continue
         # song_analysis = sp.audio_features([song_id])
         # if not song_analysis:
