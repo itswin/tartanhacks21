@@ -17,6 +17,7 @@ from spotipy.oauth2 import SpotifyOAuth
 from wtforms import StringField, SubmitField, SelectField, RadioField
 from wtforms.fields.html5 import IntegerRangeField
 from wtforms.validators import DataRequired, NumberRange
+import random
 
 genre_map = dict([(1,"Pop"), 
             (2,"hip-hop"),
@@ -85,7 +86,7 @@ apiUrl = "https://api.spotify.com/v1"
 refreshToken = None
 
 redirectUri = "http://127.0.0.1:5000/app_host"
-scope = 'user-read-private user-read-playback-state user-modify-playback-state user-library-read user-read-currently-playing user-read-recently-played playlist-read-private playlist-read-collaborative'
+scope = 'user-read-private user-read-playback-state user-modify-playback-state user-library-read user-read-currently-playing user-read-recently-played playlist-read-private playlist-read-collaborative, playlist-modify-public playlist-modify-private'
 
 authQueryParams = {
     "response_type" : "code",
@@ -148,6 +149,8 @@ def spotify_analysis():
     # auth_manager.refresh_access_token(refreshToken)
 
     # print(sp.current_user())
+    user = sp.current_user()
+    user_id = user['id']
     recently_played_info = spt.analyze_user_recently_played(sp)
     # last_day_tracks = spt.get_tracks_in_date_range(datetime(2021, 3, 6, 0, 0, 0, 0),datetime(2021, 3, 7, 0, 0, 0, 0),all_tracks)
     playlist_info = spt.analyze_playlists(sp)
@@ -163,9 +166,9 @@ def spotify_analysis():
     print("beforehere")
     form = RecommendationForm()
     print("here")
-    message = ""
+    message = {'playlist_url' : "", 'recommendations' : {}}
     if form.validate_on_submit():
-        print(genre_map)
+        # print(genre_map)
         genre_seed = [genre_map[int(form.genre.data)].lower()]
         limit = int(limit_map[int(form.limit.data)])
         acousticness = int(form.acoustic.data) / 100
@@ -179,11 +182,16 @@ def spotify_analysis():
                       'target_energy' : energy,
                       'target_valence' : positivity,
                       'target_instrumentalness' : instrumental}
-        print(genre_seed)
-        print(attributes)
+        # print(genre_seed)
+        # print(attributes)
         recommendations = spt.get_recommendations(sp, seed_genres=genre_seed, attributes=attributes, limit=limit)
-        print(recommendations)
-        message = recommendations
+        # print(recommendations)
+        playlist = sp.user_playlist_create(user_id, "Recommended" + str(random.randint(0,1000)))
+        playlist_id = playlist['id']
+        playlist_url = playlist['external_urls']['spotify']
+        track_uris = [track['uri'] for track in recommendations]
+        sp.user_playlist_add_tracks(user_id, playlist_id, track_uris)
+        message = {'playlist_url' : playlist_url, 'recommendations' : recommendations}
         print("submitted form")
     print("here2")
     # form = None
