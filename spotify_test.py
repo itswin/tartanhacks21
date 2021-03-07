@@ -20,9 +20,6 @@ Make sure you run:
 before running this script.
 '''
 
-
-
-
 def init_spotify():
     scope = "user-read-currently-playing user-read-recently-played playlist-read-private playlist-read-collaborative"
 
@@ -31,7 +28,8 @@ def init_spotify():
     return sp
 
 
-def get_tracks_from_raw(data):
+def get_tracks_from_raw(sp, data):
+    TRACK_REQUEST_LIMIT = 100
     final_data_frame = None
     data_for_dataframe = []
     for p in data['items']:
@@ -45,7 +43,33 @@ def get_tracks_from_raw(data):
         id = p['track']['id']
         data_for_dataframe.append([song_title, artist_name, played_at,id])
 
-    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'ID', ])
+    main_frame =pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'Song ID', ])
+    
+    final_audio_features = []
+    all_song_ids = main_frame['Song ID']
+    num_songids = len(all_song_ids)
+    # print("song ids:" + str(num_songids))
+    for index in range(0, num_songids, TRACK_REQUEST_LIMIT):
+        print(index)
+        curr_songids = all_song_ids[index:min(num_songids, index + TRACK_REQUEST_LIMIT)]
+        features = sp.audio_features(curr_songids)
+        final_audio_features += features
+
+    danceabilities = [features['danceability'] for features in final_audio_features]
+    energies = [features['energy'] for features in final_audio_features]
+    tempos = [features['tempo'] for features in final_audio_features]
+    valences = [features['valence'] for features in final_audio_features]
+
+    # print(len(all_tracks))
+    # print(len(danceabilities))
+
+    main_frame['Danceability'] = danceabilities
+    main_frame['Energy'] = energies
+    main_frame['Tempo'] = tempos
+    main_frame['Valence'] = valences
+
+
+    return main_frame
 
 def get_sentiment_from_song(title, artist):
     lyrics = lyrics_getter.get_song_lyrics(title, artist)
@@ -179,7 +203,7 @@ def get_current_user_playlists(sp):
 def get_current_user_recently_played(sp):
     recently_played_data = sp.current_user_recently_played(limit=50)
 
-    recently_played = get_tracks_from_raw(recently_played_data)
+    recently_played = get_tracks_from_raw(sp, recently_played_data)
 
     return recently_played
 
@@ -287,8 +311,7 @@ def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=Non
     else:
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids)
 
-    return get_tracks_from_raw_rec(recs)
-
+    return get_tracks_from_raw_rec(sp, recs)
 
 if __name__ == "__main__":
     sp = init_spotify()
