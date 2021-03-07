@@ -24,10 +24,10 @@ body {font-size:16px;}
     <h3 class="w3-padding-64"><b>Spot<br>Your<br>Mood</b></h3>
   </div>
   <div class="w3-bar-block">
-    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a> 
+    <a href="#" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Home</a>
     <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">About</a>
-    <a href="#currentmood" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Learn Your Current Mood</a> 
-    <a href="#playlistinfo" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Learn About Your Playlists</a> 
+    <a href="#currentmood" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Learn Your Current Mood</a>
+    <a href="#playlistinfo" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Learn About Your Playlists</a>
     <a href="#designplaylist" onclick="w3_close()" class="w3-bar-item w3-button w3-hover-white">Design Your Own Playlist</a>
   </div>
 </nav>
@@ -49,17 +49,28 @@ body {font-size:16px;}
         <h1 class="w3-xxxlarge w3-text-red"><b>About.</b></h1>
         <hr style="width:50px;border:5px solid red" class="w3-round">
         <p>Spot Your Mood is a spotify companion extension that allows you to learn more about your mood over time!</p>
-        <p>We display mood information about your current listening habits, as well as information about each of 
-            your playlists! We also encourage you to explore the "Design Your Own Playlist" section, where you can 
+        <p>We display mood information about your current listening habits, as well as information about each of
+            your playlists! We also encourage you to explore the "Design Your Own Playlist" section, where you can
             tweak certain music parameters, and we will generate a playlist for you that matches how you're feeling!
         </p>
       </div>
+
+
 
     <div class="w3-container" style="margin-top:80px" id="currentmood">
     <h1 class="w3-xxxlarge w3-text-red"><b>Current Mood.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p class="w3-xxxlarge w3-text-red" style="text-align: center;">
-        You Are Currenly {{recently_played_info['emotion']}}! Learn more below.</p>
+        You Are Currently {{recently_played_info['emotion']}}! Learn more below.</p>
+    </div>
+
+    <img style="margin:auto" align="center" src="/mood_graph.png"/>
+
+    <div class="w3-container" style="margin-top:80px" id="currentmoodimg">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Current Mood.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+      <p class="w3-xxxlarge w3-text-red" style="text-align: center;">
+        </p>
     </div>
 
     <table class = "styled-table">
@@ -153,7 +164,7 @@ body {font-size:16px;}
         </li>
       </ul>
     </div>
-        
+
     <div class="w3-half">
       <ul class="w3-ul w3-light-grey w3-center">
         <li class="w3-red w3-xlarge w3-padding-32">Pro</li>
@@ -172,7 +183,7 @@ body {font-size:16px;}
       </ul>
     </div>
   </div>
-  
+
   <!-- Contact -->
   <div class="w3-container" id="contact" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Contact.</b></h1>
@@ -192,7 +203,7 @@ body {font-size:16px;}
         <input class="w3-input w3-border" type="text" name="Message" required>
       </div>
       <button type="submit" class="w3-button w3-block w3-padding-large w3-red w3-margin-bottom">Send Message</button>
-    </form>  
+    </form>
   </div>
 
 <!-- End page content -->
@@ -207,7 +218,7 @@ function w3_open() {
   document.getElementById("mySidebar").style.display = "block";
   document.getElementById("myOverlay").style.display = "block";
 }
- 
+
 function w3_close() {
   document.getElementById("mySidebar").style.display = "none";
   document.getElementById("myOverlay").style.display = "none";
