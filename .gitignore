@@ -1,10 +1,5 @@
 lyrics/*
-__pycache__
 .cache
-<<<<<<< HEAD
 
 *.pyc
 app/__pycache__
-=======
-app/__pycache__
->>>>>>> 8e8c253f0b553775816e44115779ac8f51b4e648
