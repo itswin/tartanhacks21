@@ -110,17 +110,17 @@ def get_playlist_tracks_from_raw(data, sp):
         if not song_id:
             print("[BAD]")
             continue
-        song_analysis = sp.audio_features([song_id])
-        if not song_analysis:
-            print("[BAD]")
-            continue
-        danceability = song_analysis[0]['danceability']
-        energy = song_analysis[0]['energy']
-        tempo = song_analysis[0]['tempo']
-        valence = song_analysis[0]['valence']
-        # emotion_score = get_emotion_value_from_song(song_title, artist_name, danceability, energy, tempo, valence)
-        data_for_dataframe.append([song_title, artist_name, danceability, energy, tempo, valence])
-    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Danceability', 'Energy', 'Tempo', 'Valence'])
+        # song_analysis = sp.audio_features([song_id])
+        # if not song_analysis:
+        #     print("[BAD]")
+        #     continue
+        # danceability = song_analysis[0]['danceability']
+        # energy = song_analysis[0]['energy']
+        # tempo = song_analysis[0]['tempo']
+        # valence = song_analysis[0]['valence']
+        # # emotion_score = get_emotion_value_from_song(song_title, artist_name, danceability, energy, tempo, valence)
+        data_for_dataframe.append([song_title, artist_name, song_id])
+    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Song ID'])
 
 def get_playlist_tracks(sp, id, num_tracks):
     TRACK_REQUEST_LIMIT = 100
@@ -133,9 +133,33 @@ def get_playlist_tracks(sp, id, num_tracks):
         playlist_tracks = get_playlist_tracks_from_raw(playlist_track_data, sp)
         if all_tracks is None: all_tracks = playlist_tracks
         else: all_tracks.append(playlist_tracks, ignore_index=True)
+    
+    final_audio_features = []
+    all_song_ids = all_tracks['Song ID']
+    num_songids = len(all_song_ids)
+    # print("song ids:" + str(num_songids))
+    for index in range(0, num_songids, TRACK_REQUEST_LIMIT):
+        print(index)
+        curr_songids = all_song_ids[index:min(num_songids, index + TRACK_REQUEST_LIMIT)]
+        features = sp.audio_features(curr_songids)
+        final_audio_features += features
+
+    danceabilities = [features['danceability'] for features in final_audio_features]
+    energies = [features['energy'] for features in final_audio_features]
+    tempos = [features['tempo'] for features in final_audio_features]
+    valences = [features['valence'] for features in final_audio_features]
+
+    # print(len(all_tracks))
+    # print(len(danceabilities))
+
+    all_tracks['Danceability'] = danceabilities
+    all_tracks['Energy'] = energies
+    all_tracks['Tempo'] = tempos
+    all_tracks['Valence'] = valences
+
+    print("done")
 
     return all_tracks
-
 
 '''
 Returns an array of tuples (playlist_name, playlist_id, playlist_track_count)
