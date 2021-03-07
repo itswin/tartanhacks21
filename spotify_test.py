@@ -42,7 +42,10 @@ def get_tracks_from_raw(data):
         artist_name = p['track']['artists'][0]['name']
 
         played_at = p['played_at']
-    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time'])
+        id = p['track']['id']
+        data_for_dataframe.append([song_title, artist_name, played_at,id])
+
+    return pd.DataFrame(data_for_dataframe, columns = ['Name', 'Artist', 'Time', 'ID', ])
 
 def get_sentiment_from_song(title, artist):
     lyrics = lyrics_getter.get_song_lyrics(title, artist)
