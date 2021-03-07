@@ -212,14 +212,14 @@ def get_input():
 
 
 if __name__ == "__main__":
-    with open("sample_songs.txt", "r") as f:
+    with open("reference_songs/sad_songs.txt", "r") as f:
         lines = f.readlines()
         song_list = [x.strip() for x in lines[0::2]]
         artist_list = [x.strip() for x in lines[1::2]]
 
     for i in range(len(artist_list)):
         print("[GET]", song_list[i], artist_list[i])
-        filename = "lyrics/" + song_list[i] + "_" + artist_list[i]
+        filename = "lyrics/" + song_list[i] + "_" + artist_list[i] + ".txt"
         song_lyrics = get_song_lyrics(song_list[i], artist_list[i])
 
         if song_lyrics is not None:

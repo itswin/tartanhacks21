@@ -110,6 +110,8 @@ def get_playlist_lyrics(name, id, num_tracks):
     print("[FOUND LYRICS]", len(playlist_lyrics), "songs")
 
     return playlist_lyrics
+
+
 def add_to_tracks(df, new_tracks):
     df.append(new_tracks, ignore_index = True)
     return df
@@ -139,14 +141,14 @@ Valid types are album, artist, playlist, track, show, and episode.
 def get_spotify_ids(sp, queries, type='track'):
     if not queries:
         return queries
-    
+
     key = type + 's'
     ids = []
     for q in queries:
         res = sp.search(q, limit=1, offset=0, type=type)
         id = res[key]['items'][0]['id']
         ids.append(id)
-    
+
     return ids
 
 
@@ -161,12 +163,12 @@ Returns a list of tuple (song_title, artist_name)
 def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=None, attributes=None):
     seed_artist_ids = get_spotify_ids(sp, seed_artists, 'artist')
     seed_track_ids = get_spotify_ids(sp, seed_tracks, 'track')
-    
+
     if attributes:
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, **attributes)
     else:
         recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids)
-    
+
     return get_tracks_from_raw_rec(recs)
 
 
