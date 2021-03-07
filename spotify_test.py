@@ -70,20 +70,25 @@ def create_vector_values(sp,txt):
     return d
 
 def classify_song_emotion(song_values): #song values is the tuple of the values of the song we are trying to classify in order "Danceability", "Energy", "Tempo", "Valence"
-    def error(v1, v2):
+    def error(v1, v2, avg_tempo):
         temp = 0
         for i in range(len(v1)):
-            currV1 = v1[i]
-            currV2 = v2[i]
+            if i == 2:
+                currV1 = v1[i]/avg_tempo
+                currV2 = v2[i]/avg_tempo
+            else:
+                currV1 = v1[i]
+                currV2 = v2[i]
             temp += abs((currV1 - currV2))**2
         return math.sqrt(temp)
 
     classifier_dict = {"Happy": (0.6575, 0.6685, 124.95204999999999, 0.6319), "Sad": (0.52105, 0.43390000000000006, 111.12160000000002, 0.27843999999999997), "Hype": (0.601590909090909, 0.7075454545454546, 128.5876363636363, 0.44953181818181825)}
+    avg_tempo = sum([i[2] for key, i in classifier_dict.items()]) / len(classifier_dict)
     best_error = float('inf')
     best_emotion = None
     for key, value in classifier_dict.items():
-        if error(value, song_values) < best_error:
-            best_error = error(value, song_values)
+        if error(value, song_values, avg_tempo) < best_error:
+            best_error = error(value, song_values, avg_tempo)
             best_emotion = key
     return best_emotion
 
@@ -158,14 +163,14 @@ def get_emotion_value_from_song(title, artist, danceability=0, energy=0, tempo=0
     return calculate_emotion(sentiment, danceability, energy, tempo, valence)
 
 # Change to True to execute sentiment analysis maxSentimentCalls times
-callSentimentAnalysis = True
-maxSentimentCalls = 5
+callSentimentAnalysis = False
+maxSentimentCalls = 10
 sentimentCalls = 0
 def get_emotion_value_from_playlist(zipped=None, danceability=0, energy=0, tempo=0, valence=0):
     global callSentimentAnalysis
     global sentimentCalls
     global maxSentimentCalls
-    print("getting new emotion value from playlist", callSentimentAnalysis)
+    # print("getting new emotion value from playlist", callSentimentAnalysis)
     analysis = None
     if zipped is not None and callSentimentAnalysis and sentimentCalls < maxSentimentCalls:
         # callSentimentAnalysis = False
