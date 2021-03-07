@@ -61,7 +61,6 @@ auth_manager = spotipy.oauth2.SpotifyOAuth(client_id = clientId, client_secret =
 token_info = auth_manager.get_cached_token()
 sp = None
 
-
 @app.route('/')
 def index():
     return render_template('login.html')
@@ -134,6 +133,16 @@ def spotify_analysis():
     print("here2")
     # form = None
 
+
+    for info in playlist_info:
+        info['averages']['Danceability'] = round(info['averages']['Danceability'], 2)
+        info['averages']['Energy'] = round(info['averages']['Energy'], 2)
+        info['averages']['Tempo'] = round(info['averages']['Tempo'], 2)
+
+    recently_played_info['averages']['Danceability'] = round(recently_played_info['averages']['Danceability'], 2)
+    recently_played_info['averages']['Energy'] = round(recently_played_info['averages']['Energy'], 2)
+    recently_played_info['averages']['Tempo'] = round(recently_played_info['averages']['Tempo'], 2)
+
     return render_template('landing_page.html', playlist_info = playlist_info, recently_played_info = recently_played_info,
                                                 form = form,
                                                 form_submit_msg = message)
@@ -147,7 +156,9 @@ def get_mood_graph():
 
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
-    df.plot(x='Time', y='Mood', ax=ax)
+    df.plot(x='Time', y='Mood', ax=ax, color='#f44336')
+    plt.xlabel("Date")
+    plt.ylabel("Mood")
 
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)

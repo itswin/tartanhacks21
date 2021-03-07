@@ -64,15 +64,6 @@ body {font-size:16px;}
         You Are Currently {{recently_played_info['emotion']}}! Learn more below.</p>
     </div>
 
-    <img style="margin:auto" align="center" src="/mood_graph.png"/>
-
-    <div class="w3-container" style="margin-top:80px" id="currentmoodimg">
-    <h1 class="w3-xxxlarge w3-text-red"><b>Current Mood.</b></h1>
-    <hr style="width:50px;border:5px solid red" class="w3-round">
-      <p class="w3-xxxlarge w3-text-red" style="text-align: center;">
-        </p>
-    </div>
-
     <table class = "styled-table">
         <caption>Table Legend:<br>
             Danceability: On a range from 'not at all danceable' to 'disco'<br>
@@ -97,6 +88,13 @@ body {font-size:16px;}
             </tr>
         </tbody>
     </table>
+
+
+  <div class="w3-container" style="margin-top:80px" id="playlistinfo">
+    <h1 class="w3-xxxlarge w3-text-red"><b>Mood History.</b></h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round">
+    <img style="margin:auto" align="center" src="/mood_graph.png"/>
+  </div>
 
   <div class="w3-container" style="margin-top:80px" id="playlistinfo">
     <h1 class="w3-xxxlarge w3-text-red"><b>Playlist Classification.</b></h1>
