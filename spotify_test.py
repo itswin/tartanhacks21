@@ -367,7 +367,8 @@ def get_tracks_from_raw_rec(data):
     for p in data['tracks']:
         song_title = p['name']
         artist_name = p['artists'][0]['name']
-        tracks += [(song_title, artist_name)]
+        link = p['external_urls']['spotify']
+        tracks += [(song_title, artist_name, link)]
 
     return tracks
 
@@ -397,16 +398,16 @@ attributes is a dict with each target attribute (e.g. min_valence, target_livene
 
 Returns a list of tuple (song_title, artist_name)
 '''
-def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=None, attributes=None):
+def get_recommendations(sp, seed_artists=None, seed_genres=None, seed_tracks=None, attributes=None, limit=10):
     seed_artist_ids = get_spotify_ids(sp, seed_artists, 'artist')
     seed_track_ids = get_spotify_ids(sp, seed_tracks, 'track')
 
     if attributes:
-        recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, **attributes)
+        recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, limit=limit, **attributes)
     else:
-        recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids)
-
-    return get_tracks_from_raw_rec(sp, recs)
+        recs = sp.recommendations(seed_artists=seed_artist_ids, seed_genres=seed_genres, seed_tracks=seed_track_ids, limit=limit)
+    print(recs)
+    return get_tracks_from_raw_rec(recs)
 
 
 
