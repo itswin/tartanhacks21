@@ -1,5 +1,8 @@
 # tartanhacks21
-TartanHacks21
+TartanHacks21: Spot Your Mood!
+
+App Demo\
+https://youtu.be/UaUhAYyHwYQ \
 
 for running authentication:
 in command line:
